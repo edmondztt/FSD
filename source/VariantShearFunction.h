@@ -8,7 +8,7 @@
 #error This header cannot be compiled by nvcc
 #endif
 
-#include <hoomd/extern/pybind/include/pybind11/pybind11.h>
+#include <pybind11/pybind11.h>
 
 #ifndef __VARIANT_SHEAR_FUNCTION_H__
 #define __VARIANT_SHEAR_FUNCTION_H__
@@ -25,6 +25,9 @@
     getValue; if the timestep is larger than offset + total_timestep, the strain of the last
     time point is returned.
  */
+
+namespace hoomd{
+
 class VariantShearFunction : public Variant
 {
 public:
@@ -46,6 +49,14 @@ public:
     double wrapValue(double functionValue) {
         return functionValue - m_value_range * floor( (functionValue - m_min_value) / m_value_range );
     }
+    virtual Scalar min()
+    {
+        return m_min_value;
+    }
+    virtual Scalar max()
+    {
+        return m_max_value;
+    }
 
 private:
     const std::shared_ptr<ShearFunction> m_shear_func;
@@ -54,9 +65,13 @@ private:
     const double m_max_value; //!< maximum value of the output of the Variant class
     double m_end_value; //!< the last value of output after time > m_offset + m_total_timestep
     double m_value_range; //!< max_value - min_value
+    /// offset from given positions allows for negative values
+    double m_offset;
 };
 
 //! Exports VariantShearFunction class to python
 void export_VariantShearFunction(pybind11::module& m);
+
+}   // end namespace hoomd
 
 #endif

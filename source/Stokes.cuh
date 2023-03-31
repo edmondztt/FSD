@@ -76,6 +76,8 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CUFFTCOMPLEX cufftComplex
 #endif
 
+namespace hoomd
+{
 
 //! Kernel driver for the first part (no second part) of the Stokes update called by Stokes.cc
 cudaError_t Stokes_StepOne(     unsigned int timestep,
@@ -123,6 +125,6 @@ cudaError_t Stokes_StepTwo(     unsigned int timestep,
 				);
 
 
-
+} // end namespace hoomd
 
 #endif

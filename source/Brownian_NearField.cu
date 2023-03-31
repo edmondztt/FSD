@@ -10,7 +10,8 @@
 #include "Helper_Debug.cuh"
 #include "Helper_Precondition.cuh"
 
-#include "hoomd/Saru.h"
+#include "hoomd/RNGIdentifiers.h"
+#include "hoomd/RandomNumbers.h"
 using namespace hoomd;
 
 #include <stdio.h>

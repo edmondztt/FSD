@@ -14,10 +14,12 @@
     \brief Declares the Stokes class
 */
 
-#include <hoomd/Variant.h>
-//#include <hoomd/ForceCompute.h> //zhoge//RK2//////
+
 #include <hoomd/md/NeighborList.h>
 #include <hoomd/md/IntegrationMethodTwoStep.h>
+
+#include <hoomd/Variant.h>
+//#include <hoomd/ForceCompute.h> //zhoge//RK2//////
 
 #include <cufft.h>
 #include <cusparse.h>
@@ -33,13 +35,17 @@
 #error This header cannot be compiled by nvcc
 #endif
 
-#include <hoomd/extern/pybind/include/pybind11/pybind11.h>
-#include <hoomd/extern/pybind/include/pybind11/stl.h> // lets us pass arrays from python to c++
+#include <pybind11/pybind11.h>
+#include <pybind11/stl.h> // lets us pass arrays from python to c++
 
 //! Integrates the system forward considering hydrodynamic interactions by GPU
 /*! Implements overdamped integration (one step) through IntegrationMethodTwoStep interface, runs on the GPU
 */
 
+namespace hoomd
+{
+namespace md
+{
 class Stokes : public IntegrationMethodTwoStep
 {
 public:
@@ -282,5 +288,6 @@ protected:
 
 //! Exports the Stokes class to python
 void export_Stokes(pybind11::module& m);
-
+} // end namespace md
+} // end namespace hoomd
 #endif

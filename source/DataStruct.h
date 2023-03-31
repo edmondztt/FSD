@@ -23,6 +23,9 @@
 #define CUFFTCOMPLEX cufftComplex
 #endif
 
+
+namespace hoomd{
+
 //! Declare a structure to hold all of the kernel parameters
 struct KernelData
 {
@@ -213,5 +216,7 @@ struct WorkData
 
 };
 
+
+} // end namespace hoomd
 
 #endif

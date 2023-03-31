@@ -31,6 +31,12 @@
 // NOTE: The data is stored contiguously for each distance, i.e. 
 //       [ XA11, ..., ZM12 ]_1, ..., [ XA11, ..., ZM12 ]_n // 
 // 
+
+namespace hoomd
+{
+namespace md
+{
+
 void Stokes::setResistanceTable(){
 
         // Mininum Table Distance (r-2) 
@@ -23056,3 +23062,7 @@ void Stokes::setResistanceTable(){
         h_ResTable_vals.data[21998] = 0.000000;
         h_ResTable_vals.data[21999] = 0.000000;
 }
+
+
+}	// end namespace md
+}	// end namespace hoomd

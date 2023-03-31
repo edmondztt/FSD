@@ -55,7 +55,10 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SpecificShearFunction.h"
 
 // Include pybind11
-#include <hoomd/extern/pybind/include/pybind11/pybind11.h>
+#include <pybind11/pybind11.h>
+
+namespace hoomd{
+namespace md{
 
 // specify the python module. Note that the name must expliclty match the PROJECT() name provided in CMakeLists
 // (with an underscore in front)
@@ -70,3 +73,5 @@ PYBIND11_MODULE(_PSEv3, m)
     export_SpecificShearFunction(m);
     }
 
+}
+}

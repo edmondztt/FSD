@@ -1,6 +1,6 @@
 # Maintainer: Andrew M. Fiore
 
-set(COMPONENT_NAME PSEv3)
+set(COMPONENT_NAME PSEv3_plugin)
 
 set(_${COMPONENT_NAME}_sources
     module.cc
@@ -33,11 +33,14 @@ set(_${COMPONENT_NAME}_cu_sources
     Solvers.cu
     )
 
-if (ENABLE_CUDA)
-CUDA_COMPILE(_CUDA_GENERATED_FILES ${_${COMPONENT_NAME}_cu_sources} OPTIONS ${CUDA_ADDITIONAL_OPTIONS} SHARED)
-endif (ENABLE_CUDA)
+if (ENABLE_HIP)
+set(_cuda_sources ${_${COMPONENT_NAME}_cu_sources})
+endif (ENABLE_HIP)
 
-pybind11_add_module (_${COMPONENT_NAME} SHARED ${_${COMPONENT_NAME}_sources} ${_CUDA_GENERATED_FILES} NO_EXTRAS)
+pybind11_add_module(_${COMPONENT_NAME} SHARED ${_${COMPONENT_NAME}_sources} ${_cuda_sources} NO_EXTRAS)
+# Alias into the HOOMD namespace so that plugins and symlinked components both work.
+add_library(HOOMD::_${COMPONENT_NAME} ALIAS _${COMPONENT_NAME})
+
 if (APPLE)
 set_target_properties(_${COMPONENT_NAME} PROPERTIES INSTALL_RPATH "@loader_path/..;@loader_path")
 else()
@@ -45,10 +48,10 @@ set_target_properties(_${COMPONENT_NAME} PROPERTIES INSTALL_RPATH "\$ORIGIN/..;\
 endif()
 
 # Find additional libraries to be linked for the plugin
-find_library( LAPACKE_LIBRARIES lapacke PATHS /usr/local/lapack-3.6.0/lib/ )
-find_library( LAPACK_LIBRARIES lapack PATHS /usr/local/lapack-3.6.0/lib/ )
-find_library( BLAS_LIBRARIES blas PATHS /usr/local/lapack-3.6.0/lib/ )
-find_library( CBLAS_LIBRARIES cblas PATHS /usr/local/lapack-3.6.0/lib/ )
+find_library( LAPACKE_LIBRARIES lapacke PATHS /usr/local/lapack-3.6.0/ )
+find_library( LAPACK_LIBRARIES lapack PATHS /usr/local/lapack-3.6.0/ )
+find_library( BLAS_LIBRARIES blas PATHS /usr/local/lapack-3.6.0/ )
+find_library( CBLAS_LIBRARIES cblas PATHS /usr/local/lapack-3.6.0/ )
 if( LAPACKE_LIBRARIES-NOTFOUND )
         message(FATAL_ERROR "lapacke libraries not found")
 endif( LAPACKE_LIBRARIES-NOTFOUND )
@@ -68,7 +71,7 @@ message(STATUS  "found CUBLAS library: ${CUBLAS_LIBRARY}")
 set( CUBLAS_LIBRARY ${CUBLAS_LIBRARY} )
 
 # link the library to its dependencies
-target_link_libraries(_${COMPONENT_NAME} PRIVATE ${HOOMD_LIBRARIES} ${LAPACK_LIBRARIES} ${CUBLAS_LIBRARY})
+target_link_libraries(_${COMPONENT_NAME} PUBLIC HOOMD::_hoomd PRIVATE ${LAPACK_LIBRARIES} ${CUBLAS_LIBRARY})
 
 # if we are compiling with MPI support built in, set appropriate
 # compiler/linker flags
@@ -117,7 +120,3 @@ foreach(file ${files})
 endforeach()
 
 add_custom_target(copy_${COMPONENT_NAME} ALL DEPENDS ${files})
-
-if (BUILD_TESTING)
-    add_subdirectory(test-py)
-endif()

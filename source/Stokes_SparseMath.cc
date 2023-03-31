@@ -12,6 +12,11 @@
 // ***IMPORTANT: To get the cuSPARSE libraries to work, have to link to
 //               libcusparse.so in the FindHoomd makefile, like so:
 //	set(HOOMD_LIBRARIES ${HOOMD_LIB} ${HOOMD_COMMON_LIBS} /usr/local/cuda/lib64/libcublas.so /usr/local/cuda/lib64/libcusparse.so )
+
+namespace hoomd
+{
+namespace md
+{
 void Stokes::setSparseMath(){
 
 	// Set up the arrays and memory required to store the matrix information
@@ -161,3 +166,6 @@ void Stokes::setSparseMath(){
 	cublasCreate( &blasHandle );
 
 }
+
+}	// end namespace md
+}	// end namespace hoomd

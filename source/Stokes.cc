@@ -43,6 +43,11 @@ using namespace std;
 	kappa           inverse Debye length (electrostatic repulsion)
 	k_n             collision spring constant
 */
+
+namespace hoomd
+{
+namespace md
+{
 Stokes::Stokes(std::shared_ptr<SystemDefinition> sysdef,
                std::shared_ptr<ParticleGroup> group,
 	       std::shared_ptr<Variant> T,
@@ -725,7 +730,7 @@ void Stokes::OutputData( unsigned int timestep, BoxDim box, Scalar current_shear
   ArrayHandle<unsigned int> h_tag_array(     m_pdata->getTags(),              access_location::host, access_mode::read);
   ArrayHandle<unsigned int> h_nneigh_ewald(  m_nlist_ewald->getNNeighArray(), access_location::host, access_mode::read);
   ArrayHandle<unsigned int> h_nlist_ewald(   m_nlist_ewald->getNListArray(),  access_location::host, access_mode::read);
-  ArrayHandle<unsigned int> h_headlist_ewald(m_nlist_ewald->getHeadList(),    access_location::host, access_mode::read);
+  ArrayHandle<size_t> h_headlist_ewald(m_nlist_ewald->getHeadList(),    access_location::host, access_mode::read);
 
   // Format the timestep to a string
   std::ostringstream timestep_str;
@@ -1169,10 +1174,11 @@ void Stokes::setFriction( std::string friction_type,
 */
 void Stokes::integrateStepOne(unsigned int timestep)
 {
-
+	// Edmond 03/30/2023: profiling method changed in v3
+	// TODO : implement the new method later
 	// profile this step
-	if (m_prof)
-	  m_prof->push(m_exec_conf, "Stokes step 1 (no step 2)");
+	// if (m_prof)
+	//   m_prof->push(m_exec_conf, "Stokes step 1 (no step 2)");
   
 	// ********************************************************************
 	// Get Handles to Device Arrays
@@ -1184,7 +1190,7 @@ void Stokes::integrateStepOne(unsigned int timestep)
 	// Access the neighbor lists
 	ArrayHandle<unsigned int> d_nneigh_ewald(   m_nlist_ewald->getNNeighArray(), access_location::device, access_mode::read );
 	ArrayHandle<unsigned int> d_nlist_ewald(    m_nlist_ewald->getNListArray(),  access_location::device, access_mode::read );
-	ArrayHandle<unsigned int> d_headlist_ewald( m_nlist_ewald->getHeadList(),    access_location::device, access_mode::read );
+	ArrayHandle<size_t> d_headlist_ewald( m_nlist_ewald->getHeadList(),    access_location::device, access_mode::read );
 	
 	// Pruned neighbor list for lubrication preconditioner
 	// This list is constructed in Precondition_Wrap(). (zhoge: overwrite??)
@@ -1240,8 +1246,8 @@ void Stokes::integrateStepOne(unsigned int timestep)
 	ArrayHandle<float> d_Diag(     m_Diag,     access_location::device, access_mode::overwrite ); //GPUdebug
 	ArrayHandle<int>   d_HasNeigh( m_HasNeigh, access_location::device, access_mode::overwrite ); //GPUdebug
 	
-	ArrayHandle<float> d_ResTable_dist( m_ResTable_dist, access_location::device, access_mode::read );
-	ArrayHandle<float> d_ResTable_vals( m_ResTable_vals, access_location::device, access_mode::read );
+	ArrayHandle<Scalar> d_ResTable_dist( m_ResTable_dist, access_location::device, access_mode::read );
+	ArrayHandle<Scalar> d_ResTable_vals( m_ResTable_vals, access_location::device, access_mode::read );
 	
 	ArrayHandle<unsigned int> d_nneigh_less( m_nneigh_less, access_location::device, access_mode::overwrite ); //GPUdebug	
 	ArrayHandle<unsigned int> d_NEPP(        m_NEPP,        access_location::device, access_mode::overwrite ); //GPUdebug	
@@ -1269,7 +1275,7 @@ void Stokes::integrateStepOne(unsigned int timestep)
 					m_seed_rfd,
 					m_m_Lanczos_ff,
 					m_m_Lanczos_nf,
-					float(m_T->getValue(timestep)),
+					float((*m_T)(timestep)), // Edmond 03/31/2023 for v3 interface
 					m_rfd_epsilon
 					};
 	BrownianData *bro_data = &bro_struct;
@@ -1453,9 +1459,10 @@ void Stokes::integrateStepOne(unsigned int timestep)
 	if (m_exec_conf->isCUDAErrorCheckingEnabled())
 		CHECK_CUDA_ERROR();
 
+	// Edmond 03/30/2023: profiling method changed in v3
 	// done profiling
-	if (m_prof)
-		m_prof->pop(m_exec_conf);
+	// if (m_prof)
+	// 	m_prof->pop(m_exec_conf);
 
 }
 
@@ -1482,6 +1489,9 @@ void export_Stokes(pybind11::module& m)
     .def("setFriction", &Stokes::setFriction)
     ;
 }
+
+} // end namespace md
+} // end namespace hoomd
 
 #ifdef WIN32
 #pragma warning( pop )
