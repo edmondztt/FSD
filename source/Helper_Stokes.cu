@@ -35,6 +35,12 @@
 	d_group_members		(input)  index into vectors
 
 */
+
+namespace hoomd
+{
+namespace md
+{
+
 __global__ void Stokes_SetForce_kernel(
 						Scalar4 *d_net_force,
 						float   *d_AppliedForce,
@@ -183,3 +189,6 @@ __global__ void Stokes_SetVelocity_kernel(
 	}
 }
 
+
+}	// end namespace md
+}	// end namespace hoomd

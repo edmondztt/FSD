@@ -1,11 +1,20 @@
 // Modified by Andrew Fiore
 // Modified by Zhouyang Ge
 
-#ifndef SINGLE_PRECISION
-#define CUFFTCOMPLEX cufftComplex
+// Edmond 03/31/2023: try to mimic PPPMForceComputeGPU & CommunicatorGridGPU for HIP
+//! Definition for comxplex variable storage
+#ifdef SINGLE_PRECISION
+#define CUFFTCOMPLEX hipfftComplex
 #else
-#define CUFFTCOMPLEX cufftComplex
+#define CUFFTCOMPLEX hipfftComplex
 #endif
+
+// //! Definition for comxplex variable storage
+// #ifdef SINGLE_PRECISION
+// #define CUFFTCOMPLEX cufftComplex
+// #else
+// #define CUFFTCOMPLEX cufftComplex
+// #endif
 
 #ifndef __STOKES_H__
 #define __STOKES_H__
@@ -21,7 +30,20 @@
 #include <hoomd/Variant.h>
 //#include <hoomd/ForceCompute.h> //zhoge//RK2//////
 
+// Edmond 03/31/2023: try to mimic PPPMForceComputeGPU & CommunicatorGridGPU for HIP
+#include "hip/hip_runtime.h"
+
+#if defined(ENABLE_HIP)
+#ifdef __HIP_PLATFORM_HCC__
+#include <hipfft.h>
+#else
 #include <cufft.h>
+typedef cufftComplex hipfftComplex;
+#endif
+#endif
+/*********************/
+// #include <cufft.h>
+
 #include <cusparse.h>
 #include <cusolverSp.h>
 #include "cublas_v2.h"

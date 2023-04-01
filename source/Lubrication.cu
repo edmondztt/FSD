@@ -37,6 +37,7 @@
 #endif
 
 
+
 /*
 	This file defines functions required to compute the lubrication interations,
 	i.e. compute the action of the lubrication tensor on a vector
@@ -65,6 +66,12 @@
 	\param rlub		lubrication cutoff distance
 
 */
+
+namespace hoomd
+{
+namespace md
+{
+
 
 __global__ void Lubrication_RFU_kernel(
 					Scalar *d_Force,          // output
@@ -1196,13 +1203,13 @@ __global__ void Lubrication_RSE_kernel(
 
 */
 __global__ void Lubrication_RSEgeneral_kernel(
-					Scalar *d_Stresslet,
-					Scalar *d_Strain,
+					float *d_Stresslet,
+					float *d_Strain,
 					int group_size,
 					unsigned int *d_group_members,
 					const unsigned int *d_n_neigh,
 					unsigned int *d_nlist,
-					const unsigned int *d_headlist,
+					const long unsigned int *d_headlist,
 					Scalar4 *d_pos,
 			      		BoxDim box,
 					const Scalar *d_ResTable_dist,
@@ -1695,3 +1702,6 @@ __global__ void Lubrication_RFEgeneral_kernel(
 
 	} // Check for thread in bounds
 }
+
+}	// end namespace md
+}	// end namespace hoomd

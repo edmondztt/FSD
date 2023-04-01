@@ -12,7 +12,8 @@
 
 #include "hoomd/RNGIdentifiers.h"
 #include "hoomd/RandomNumbers.h"
-using namespace hoomd;
+
+#include "hoomd/HOOMDMath.h"
 
 #include <stdio.h>
 #include <math.h>
@@ -44,10 +45,18 @@ using namespace hoomd;
 	T		(input)  Temperature
 	dt		(input)  Time step
 */
+namespace hoomd
+{
+namespace md
+{
+
 __global__ void Brownian_NearField_RNG_kernel(
-						float *d_Psi_nf,
+						Scalar *d_Psi_nf,
 						unsigned int group_size,
-						const unsigned int seed,
+						// Edmond 03/31/2023 : rand number now passed in seed & timestep
+						// const unsigned int seed
+						uint64_t timestep,
+						uint16_t seed,
 						const float T,
 						const float dt
 						){
@@ -57,9 +66,12 @@ __global__ void Brownian_NearField_RNG_kernel(
 
 	// Check if thread is in bounds, and if so do work
 	if (idx < group_size) {
-
-                // Initialize random number generator
-                detail::Saru s(idx, seed);
+		// Edmond 03/31/2023:
+		// Initialize the RNG
+        RandomGenerator rng(hoomd::Seed(50, timestep, seed),
+			hoomd::Counter(idx));
+			// // Initialize random number generator
+			// detail::Saru s(idx, seed);
 
 		// Scaling factor to get the variance right
 		//
@@ -69,15 +81,16 @@ __global__ void Brownian_NearField_RNG_kernel(
 		// so we have to multiply by 3 to get the proper variance
 		//
 		// Therefore the right scale is 3 * ( 2 * T / dt );
+		// Edmond 03/31/2023:
 		float fac = sqrtf( 3.0 * ( 2.0 * T / dt ) );
-
+		hoomd::UniformDistribution<Scalar> uniform(Scalar(-fac), Scalar(fac));
 		// Generate random numbers and assign to global output
-		d_Psi_nf[ 6 * idx     ] = s.f( -fac, fac );
-		d_Psi_nf[ 6 * idx + 1 ] = s.f( -fac, fac );
-		d_Psi_nf[ 6 * idx + 2 ] = s.f( -fac, fac );
-		d_Psi_nf[ 6 * idx + 3 ] = s.f( -fac, fac );
-		d_Psi_nf[ 6 * idx + 4 ] = s.f( -fac, fac );
-		d_Psi_nf[ 6 * idx + 5 ] = s.f( -fac, fac );
+		d_Psi_nf[ 6 * idx     ] = uniform(rng);
+		d_Psi_nf[ 6 * idx + 1 ] = uniform(rng);
+		d_Psi_nf[ 6 * idx + 2 ] = uniform(rng);
+		d_Psi_nf[ 6 * idx + 3 ] = uniform(rng);
+		d_Psi_nf[ 6 * idx + 4 ] = uniform(rng);
+		d_Psi_nf[ 6 * idx + 5 ] = uniform(rng);
 
 	} // Check if thread is in bounds
 
@@ -167,18 +180,18 @@ void Brownian_NearField_Lanczos(
 
 	// Norm of starting vector (also psi)
         Scalar vnorm, psinorm;
-	cublasSnrm2( blasHandle, numel, d_psi, 1, &vnorm );
+	cublasDnrm2( blasHandle, numel, d_psi, 1, &vnorm );
 	psinorm = vnorm;
  
         // First iteration
 	// vjm1 = 0 
 	// vj = psi / norm( psi )
 	Scalar scale = 0.0;
-	cublasSscal( blasHandle, numel, &scale, d_vjm1, 1 );
+	cublasDscal( blasHandle, numel, &scale, d_vjm1, 1 );
 
 	cudaMemcpy( d_vj, d_psi, numel*sizeof(Scalar), cudaMemcpyDeviceToDevice );
 	scale = 1.0 / psinorm;
-	cublasSscal( blasHandle, numel, &scale, d_vj, 1 );	
+	cublasDscal( blasHandle, numel, &scale, d_vj, 1 );	
 	
 	//
 	// Do the calculation for 1 fewer iterations than requested so that we can check the step norm
@@ -205,20 +218,20 @@ void Brownian_NearField_Lanczos(
 							);
 
 		scale = -1.0 * tempbeta;
-		cublasSaxpy( blasHandle, numel, &scale, d_vjm1, 1, d_v, 1 );
+		cublasDaxpy( blasHandle, numel, &scale, d_vjm1, 1, d_v, 1 );
 	
 		// vj dot v
-		cublasSdot( blasHandle, numel, d_v, 1, d_vj, 1, &tempalpha );
+		cublasDdot( blasHandle, numel, d_v, 1, d_vj, 1, &tempalpha );
 	       
 		// Store updated alpha
 		alpha[jj] = tempalpha;
 	
 		// v = v - alphaj*vj
 		scale = -1.0 * tempalpha;
-		cublasSaxpy( blasHandle, numel, &scale, d_vj, 1, d_v, 1 );
+		cublasDaxpy( blasHandle, numel, &scale, d_vj, 1, d_v, 1 );
 		
 		// betajp1 = norm( v ) 
-		cublasSnrm2( blasHandle, numel, d_v, 1, &tempbeta );
+		cublasDnrm2( blasHandle, numel, d_v, 1, &tempbeta );
 		beta[jj+1] = tempbeta;
 		
 		if ( tempbeta < 1E-8 ){
@@ -228,7 +241,7 @@ void Brownian_NearField_Lanczos(
 
 		// vjp1 = v / betajp1
 		scale = 1.0 / tempbeta;
-		cublasSscal( blasHandle, numel, &scale, d_v, 1 );
+		cublasDscal( blasHandle, numel, &scale, d_v, 1 );
 
 		// Store current basis vector
 		cudaMemcpy( &d_V[(jj+2)*numel], d_v, numel*sizeof(Scalar), cudaMemcpyDeviceToDevice );
@@ -297,20 +310,20 @@ void Brownian_NearField_Lanczos(
 							);
 
 		scale = -1.0 * tempbeta;
-		cublasSaxpy( blasHandle, numel, &scale, d_vjm1, 1, d_v, 1 );
+		cublasDaxpy( blasHandle, numel, &scale, d_vjm1, 1, d_v, 1 );
 
 		// vj dot v
-		cublasSdot( blasHandle, numel, d_v, 1, d_vj, 1, &tempalpha );
+		cublasDdot( blasHandle, numel, d_v, 1, d_vj, 1, &tempalpha );
 	       
 		// Store updated alpha
 		alpha[jj] = tempalpha;
 	
 		// v = v - alphaj*vj
 		scale = -1.0 * tempalpha;
-		cublasSaxpy( blasHandle, numel, &scale, d_vj, 1, d_v, 1 );
+		cublasDaxpy( blasHandle, numel, &scale, d_vj, 1, d_v, 1 );
 		
 		// betajp1 = norm( v ) 
-		cublasSnrm2( blasHandle, numel, d_v, 1, &tempbeta );
+		cublasDnrm2( blasHandle, numel, d_v, 1, &tempbeta );
 		beta[jj+1] = tempbeta;
 		
 		if ( tempbeta < 1E-8 ){
@@ -320,7 +333,7 @@ void Brownian_NearField_Lanczos(
 
 		// vjp1 = v / betajp1
 		scale = 1.0 / tempbeta;
-		cublasSscal( blasHandle, numel, &scale, d_v, 1 );
+		cublasDscal( blasHandle, numel, &scale, d_v, 1 );
 
 		// Store current basis vector
 		cudaMemcpy( &d_V[(jj+2)*numel], d_v, numel*sizeof(Scalar), cudaMemcpyDeviceToDevice );
@@ -353,11 +366,11 @@ void Brownian_NearField_Lanczos(
 		// Compute step norm error
 		//
 		scale = -1.0;
-		cublasSaxpy( blasHandle, numel, &scale, d_FBnf, 1, d_FBnf_old, 1 );
-		cublasSnrm2( blasHandle, numel, d_FBnf_old, 1, &stepnorm );
+		cublasDaxpy( blasHandle, numel, &scale, d_FBnf, 1, d_FBnf_old, 1 );
+		cublasDnrm2( blasHandle, numel, d_FBnf_old, 1, &stepnorm );
 		
-		float fbnorm = 0.0;
-		cublasSnrm2( blasHandle, numel, d_FBnf, 1, &fbnorm );
+		double fbnorm = 0.0;
+		cublasDnrm2( blasHandle, numel, d_FBnf, 1, &fbnorm );
 		stepnorm /= fbnorm;
 
 		// Copy velocity
@@ -386,7 +399,7 @@ void Brownian_NearField_Lanczos(
 					);
 	
 	// Rescale by original norm of Psi
-	cublasSscal( blasHandle, numel, &psinorm, d_FBnf, 1 );	
+	cublasDscal( blasHandle, numel, &psinorm, d_FBnf, 1 );	
  
 	// Free the memory and clear pointers
 	d_v = NULL;
@@ -448,12 +461,13 @@ void Brownian_NearField_Force(
 	if ( (bro_data->T) > 0.0 ){
 
 		// Initialize vectors
-		float *d_Psi_nf = (work_data->bro_nf_psi);
+		Scalar *d_Psi_nf = (work_data->bro_nf_psi);
 
 		// Generate the random vectors on each particle
 		Brownian_NearField_RNG_kernel<<<grid,threads>>>( 
 								d_Psi_nf,
 								group_size,
+								bro_data->timestep,
 								bro_data->seed_nf,
 								bro_data->T,
 								dt
@@ -483,3 +497,6 @@ void Brownian_NearField_Force(
 }
 
 
+
+}	// end namespace md
+}	// end namespace hoomd

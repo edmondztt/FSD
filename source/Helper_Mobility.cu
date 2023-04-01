@@ -84,6 +84,12 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    	NxNyNz		(input)		dimension of the grid
 
 */
+namespace hoomd
+{
+namespace md
+{
+
+
 __global__ void Mobility_ZeroGrid_kernel(
 						CUFFTCOMPLEX *grid,
 						unsigned int NxNyNz
@@ -379,3 +385,6 @@ __global__ void Mobility_SetGridk_kernel(
         }
 }
 
+
+}	// end namespace md
+}	// end namespace hoomd

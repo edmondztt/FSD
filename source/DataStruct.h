@@ -9,7 +9,21 @@
 
 #include "hoomd/HOOMDMath.h"
 
+
+// Edmond 03/31/2023: try to mimic PPPMForceComputeGPU & CommunicatorGridGPU for HIP
+#include "hip/hip_runtime.h"
+
+#if defined(ENABLE_HIP)
+#ifdef __HIP_PLATFORM_HCC__
+#include <hipfft.h>
+#else
 #include <cufft.h>
+typedef cufftComplex hipfftComplex;
+#endif
+#endif
+/*********************/
+// #include <cufft.h>
+
 #include <cusparse.h>
 #include <cusolverSp.h>
 #include "cublas_v2.h"
@@ -17,11 +31,20 @@
 #ifndef __DATA_STRUCT_H__
 #define __DATA_STRUCT_H__
 
+// Edmond 03/31/2023: try to mimic PPPMForceComputeGPU & CommunicatorGridGPU for HIP
+//! Definition for comxplex variable storage
 #ifdef SINGLE_PRECISION
-#define CUFFTCOMPLEX cufftComplex
+#define CUFFTCOMPLEX hipfftComplex
 #else
-#define CUFFTCOMPLEX cufftComplex
+#define CUFFTCOMPLEX hipfftComplex
 #endif
+
+// //! Definition for comxplex variable storage
+// #ifdef SINGLE_PRECISION
+// #define CUFFTCOMPLEX cufftComplex
+// #else
+// #define CUFFTCOMPLEX cufftComplex
+// #endif
 
 
 namespace hoomd{
@@ -74,7 +97,7 @@ struct MobilityData
 
 	unsigned int *nneigh;		//!< Ewald sum real space number of neighbors
 	unsigned int *nlist;		//!< Ewald sum real space neighbor list
-	unsigned int *headlist;		//!< Ewald sum real space headlist
+	long unsigned int *headlist;		//!< Ewald sum real space headlist
 
 	Scalar eta;		//!< Ewald sum wave space spectral Ewald decay parameter
 	int P;			//!< Ewald sum wave space spectral Ewald support size
@@ -107,7 +130,7 @@ struct ResistanceData
 
 	unsigned int *nneigh;		//!< Lubrication interaction number of neighbors
 	unsigned int *nlist;		//!< Lubrication interaction neighbor list
-	unsigned int *headlist;		//!< Lubrication interaction headlist
+	long unsigned int *headlist;		//!< Lubrication interaction headlist
 	
 	unsigned int *nneigh_pruned;	//!< Number of neighbors for pruned neighborlist
 	unsigned int *headlist_pruned;	//!< Headlist for pruned neighborlist
@@ -123,8 +146,8 @@ struct ResistanceData
 	int   *L_ColInd;	//!< Lubrication preconditioner, sparse storage, column indices
 	float *L_Val;		//!< Lubrication preconditioner, sparse storage, values
 
-	float *table_dist;	//!< Resistance tabulation distances
-	float *table_vals; 	//!< Resistance tabulation values
+	double *table_dist;	//!< Resistance tabulation distances
+	double *table_vals; 	//!< Resistance tabulation values
 	float table_min;	//!< Resistance tabulation shortest distance
 	float table_dr;		//!< Resistance tabulation discretization
 

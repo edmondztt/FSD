@@ -13,7 +13,8 @@
 #include "Precondition.cuh"
 #include "Solvers.cuh"
 
-#include "hoomd/Saru.h"
+#include "hoomd/RNGIdentifiers.h"
+#include "hoomd/RandomNumbers.h"
 
 #include <stdio.h>
 
@@ -44,6 +45,12 @@
 	\param spStatus		status returned from cuSPARSE call
 
 */
+
+namespace hoomd
+{
+namespace md
+{
+
 void Debug_StatusCheck_cuSparse( cusparseStatus_t spStatus, const char *name ){
 
 	if (      spStatus == CUSPARSE_STATUS_SUCCESS ){
@@ -709,6 +716,8 @@ void Debug_Lattice_ShearViscosity(
 
 }
 
+}	// end namespace md
+}	// end namespace hoomd
 //    /*!
 //    	Compute short-time self-diffusion coefficient from the trace of the resistance tensor < Psi * RFU * Psi >
 //    */

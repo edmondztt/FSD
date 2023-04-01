@@ -11,7 +11,7 @@
 
 #include "hoomd/RNGIdentifiers.h"
 #include "hoomd/RandomNumbers.h"
-using namespace hoomd;
+
 
 #include <stdio.h>
 #include <math.h>
@@ -42,11 +42,19 @@ using namespace hoomd;
 	d_group_members		(input)  index to particle arrays
 	seed			(input)  seed for random number generation
 */
+
+namespace hoomd
+{
+namespace md
+{
 __global__ void Brownian_FarField_RNG_Particle_kernel(
 							Scalar4 *d_psi,
 							unsigned int group_size,
 							unsigned int *d_group_members,
-							const unsigned int seed
+							// Edmond 03/31/2023 : rand number now passed in seed & timestep
+							// const unsigned int seed
+							uint64_t timestep,
+							uint16_t seed
 							){
 
 	// Thread index
@@ -54,37 +62,41 @@ __global__ void Brownian_FarField_RNG_Particle_kernel(
 
 	// Check if thread is in bounds, and if so do work
 	if (idx < group_size) {
-
-                // Initialize random number generator
-                detail::Saru s(idx, seed);
+		// Edmond 03/31/2023:
+		// Initialize the RNG
+		RandomGenerator rng(hoomd::Seed(50, timestep, seed),
+			hoomd::Counter(idx));
+                // // Initialize random number generator
+                // detail::Saru s(idx, seed);
 
 		// Square root of 3
 		float sqrt3 = 1.732050807568877;
 		
 		//
 		float randomx, randomy, randomz, randomw;
-
+		// Edmond 03/31/2023:
+		hoomd::UniformDistribution<Scalar> uniform(Scalar(-sqrt3), Scalar(sqrt3));
 		// First bit 
-		randomx = s.f( -sqrt3, sqrt3 );
-		randomy = s.f( -sqrt3, sqrt3 );
-		randomz = s.f( -sqrt3, sqrt3 );
-		randomw = s.f( -sqrt3, sqrt3 );
+		randomx = uniform(rng);
+		randomy = uniform(rng);
+		randomz = uniform(rng);
+		randomw = uniform(rng);
 
 		d_psi[ idx ] = make_scalar4( randomx, randomy, randomz, randomw );
 
 		// Second bit
-		randomx = s.f( -sqrt3, sqrt3 );
-		randomy = s.f( -sqrt3, sqrt3 );
-		randomz = s.f( -sqrt3, sqrt3 );
-		randomw = s.f( -sqrt3, sqrt3 );
+		randomx = uniform(rng);
+		randomy = uniform(rng);
+		randomz = uniform(rng);
+		randomw = uniform(rng);
 
 		d_psi[ group_size + 2*idx ] = make_scalar4( randomx, randomy, randomz, randomw );
 		
 		// Third bit
-		randomx = s.f( -sqrt3, sqrt3 );
-		randomy = s.f( -sqrt3, sqrt3 );
-		randomz = s.f( -sqrt3, sqrt3 );
-		randomw = s.f( -sqrt3, sqrt3 );
+		randomx = uniform(rng);
+		randomy = uniform(rng);
+		randomz = uniform(rng);
+		randomw = uniform(rng);
 
 		d_psi[ group_size + 2*idx+1 ] = make_scalar4( randomx, randomy, randomz, randomw );
 
@@ -119,7 +131,10 @@ __global__ void Brownian_FarField_RNG_Grid1of2_kernel(
 								int Nx,
 								int Ny,
 								int Nz,
-				        			const unsigned int seed,
+				        		// Edmond 03/31/2023 : rand number now passed in seed & timestep
+								// const unsigned int seed
+								uint64_t timestep,
+								uint16_t seed,
 								Scalar T,
 								Scalar dt,
 								Scalar quadW
@@ -143,15 +158,20 @@ __global__ void Brownian_FarField_RNG_Grid1of2_kernel(
 		Scalar fac = sqrtf( 3.0 * T / dt / quadW );
 
 		// Get random numbers 
-                detail::Saru s(idx, seed);
-		
-		Scalar reX = s.f( -fac, fac );
-		Scalar reY = s.f( -fac, fac );
-		Scalar reZ = s.f( -fac, fac );
+                // detail::Saru s(idx, seed);
+		// Edmond 03/31/2023:
+		// Initialize the RNG
+        RandomGenerator rng(hoomd::Seed(50, timestep, seed),
+			hoomd::Counter(idx));
+		hoomd::UniformDistribution<Scalar> uniform(Scalar(-fac), Scalar(fac));
 
-		Scalar imX = s.f( -fac, fac );
-		Scalar imY = s.f( -fac, fac );
-		Scalar imZ = s.f( -fac, fac );
+		Scalar reX = uniform(rng);
+		Scalar reY = uniform(rng);
+		Scalar reZ = uniform(rng);
+
+		Scalar imX = uniform(rng);
+		Scalar imY = uniform(rng);
+		Scalar imZ = uniform(rng);
 		
 		// Indices for current grid point
 		int kk = idx % Nz;
@@ -274,7 +294,10 @@ __global__ void Brownian_FarField_RNG_Grid2of2_kernel(
 					      			int Nx,
 					      			int Ny,
 					      			int Nz,
-				              			const unsigned int seed,
+									// Edmond 03/31/2023 : rand number now passed in seed & timestep
+									// const unsigned int seed
+									uint64_t timestep,
+									uint16_t seed,
 					      			Scalar T,
 					      			Scalar dt,
 					      			Scalar quadW
@@ -415,7 +438,7 @@ void Brownian_FarField_Lanczos(
 			        Scalar4 *d_ewaldC1, 
 			        const unsigned int *d_nneigh,
                                 const unsigned int *d_nlist,
-                                const unsigned int *d_headlist,
+                                const long unsigned int *d_headlist,
 			        int& m,
 				Scalar tol,
 			        dim3 grid,
@@ -912,7 +935,7 @@ void Brownian_FarField_SlipVelocity(
 		// Generate uniform distribution (-1,1) on d_psi
 		// VERY IMPORTANT TO USE A DIFFERENT, DE-CORRELATED SEED FROM THE OTHER RANDOM FUNCTION FOR WAVE SPACE!!!!!
 		Scalar4 *d_psi = (work_data->bro_ff_psi);
-		Brownian_FarField_RNG_Particle_kernel<<<grid, threads>>>( d_psi, group_size, d_group_members, bro_data->seed_ff_rs );
+		Brownian_FarField_RNG_Particle_kernel<<<grid, threads>>>( d_psi, group_size, d_group_members, bro_data->timestep, bro_data->seed_ff_rs );
 		
 		// Spreading and contraction stuff
 		int P = (mob_data->P);
@@ -956,6 +979,7 @@ void Brownian_FarField_SlipVelocity(
 											mob_data->Nx,
 											mob_data->Ny,
 											mob_data->Nz,
+											bro_data->timestep,
 											bro_data->seed_ff_ws,
 											bro_data->T,
 											dt,
@@ -978,6 +1002,7 @@ void Brownian_FarField_SlipVelocity(
 											mob_data->Nx,
 											mob_data->Ny,
 											mob_data->Nz,
+											bro_data->timestep,
 											bro_data->seed_ff_ws,
 											bro_data->T,
 											dt,
@@ -1101,5 +1126,6 @@ void Brownian_FarField_SlipVelocity(
 	} // Check for positive Temperature
 }
 
-
+}	// end namespace md
+}	// end namespace hoomd
 

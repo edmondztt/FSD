@@ -35,6 +35,8 @@
 #include <assert.h>
 #endif
 
+
+
 /*! \file Integrator.cu
     \brief Defines integrator functions to capture Brownian drift in the
 		velocity and stresslet. 
@@ -56,6 +58,12 @@
 	equal to the number of members in the group. The kernel's implementation simply reads one particle in each thread
 	and updates that particle. 
 */
+
+namespace hoomd
+{
+namespace md
+{
+
 extern "C" __global__ void Integrator_ExplicitEuler_kernel(	
 								Scalar4 *d_pos_in,
 								Scalar4 *d_pos_out,
@@ -757,3 +765,6 @@ void Integrator_ComputeVelocity(     unsigned int timestep,
 	cudaFree( pBuffer );
 	
 }
+
+}	// end namespace md
+}	// end namespace hoomd

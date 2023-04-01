@@ -31,6 +31,12 @@
    	N 	(input)  	N number of particles
 	stride	(input)  	Vector length multiple (length = stride * N)
 */
+
+namespace hoomd
+{
+namespace md
+{
+
 __global__ void Precondition_ZeroVector_kernel(
 						float *d_b,
 						const unsigned int nnz,
@@ -629,3 +635,6 @@ __global__ void Precondition_Lmult_kernel(
 	} // Check for thread in bounds
 
 }
+
+}	// end namespace md
+}	// end namespace hoomd

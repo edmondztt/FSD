@@ -87,6 +87,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 
+
 /*
 	This file contains the functions required to compute the action of the
 	Mobility tensor on a vector using the Ewald sum.
@@ -127,6 +128,12 @@ scalar4_tex_t tables1_tex;
 	prefac			(input)  prefactor for Gaussian envelope
 	expfac			(input)  decay factor for Gaussian envelope
 */
+
+namespace hoomd
+{
+namespace md
+{
+
 __global__ void Mobility_WaveSpace_Spread_kernel( 	
 							Scalar4 *d_pos,
 						    	Scalar4 *d_net_force,
@@ -1225,8 +1232,8 @@ void Mobility_RealSpaceFTS(
 				Scalar4 *d_ewaldC1, 
 				Scalar2 self,
 				const unsigned int *d_nneigh,
-                        	const unsigned int *d_nlist,
-                        	const unsigned int *d_headlist,
+				const unsigned int *d_nlist,
+				const long unsigned int *d_headlist,
 				dim3 grid,
 				dim3 threads
 				){
@@ -1465,3 +1472,7 @@ void Mobility_GeneralizedMobility(
 	d_TorqueStress = NULL;
  
 }
+
+
+}	// end namespace md
+}	// end namespace hoomd

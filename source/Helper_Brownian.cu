@@ -24,6 +24,7 @@
 #endif
 
 
+
 /*! \file Helper_Brownian.cu
     	\brief Helper functions to perform additions, dot products, etc., needed 
 		in the Brownian calculations
@@ -43,6 +44,12 @@ extern __shared__ Scalar partial_sum[];
 	group_size		(input)  length of vectors a and b
         d_group_members		(input)  index into vectors
 */
+
+namespace hoomd
+{
+namespace md
+{
+
 __global__ void Brownian_FarField_Dot1of2_kernel(
 							Scalar4 *d_a, 
 							Scalar4 *d_b, 
@@ -361,7 +368,7 @@ void Brownian_Sqrt(
 			float *W,
 			float *W1,
 			float *Tm,
-			float *d_Tm
+			Scalar *d_Tm
 			){
 		
 	// Save alpha, beta vectors (will be overwritten by lapack)
@@ -416,3 +423,6 @@ void Brownian_Sqrt(
 	cudaMemcpy( d_Tm, Tm, m*sizeof(Scalar), cudaMemcpyHostToDevice );
 
 }
+
+}	// end namespace md
+}	// end namespace hoomd

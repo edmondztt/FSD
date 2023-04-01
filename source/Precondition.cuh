@@ -9,7 +9,19 @@
 #include "hoomd/ParticleData.cuh"
 #include "hoomd/HOOMDMath.h"
 
+// Edmond 03/31/2023: try to mimic PPPMForceComputeGPU & CommunicatorGridGPU for HIP
+#include "hip/hip_runtime.h"
+
+#if defined(ENABLE_HIP)
+#ifdef __HIP_PLATFORM_HCC__
+#include <hipfft.h>
+#else
 #include <cufft.h>
+typedef cufftComplex hipfftComplex;
+#endif
+#endif
+/*********************/
+// #include <cufft.h>
 
 #include "DataStruct.h"
 
@@ -28,16 +40,26 @@
 #ifndef __PRECONDITION_CUH__
 #define __PRECONDITION_CUH__
 
+// Edmond 03/31/2023: try to mimic PPPMForceComputeGPU & CommunicatorGridGPU for HIP
 //! Definition for comxplex variable storage
 #ifdef SINGLE_PRECISION
-#define CUFFTCOMPLEX cufftComplex
+#define CUFFTCOMPLEX hipfftComplex
 #else
-#define CUFFTCOMPLEX cufftComplex
+#define CUFFTCOMPLEX hipfftComplex
 #endif
 
+// //! Definition for comxplex variable storage
+// #ifdef SINGLE_PRECISION
+// #define CUFFTCOMPLEX cufftComplex
+// #else
+// #define CUFFTCOMPLEX cufftComplex
+// #endif
+
+using namespace hoomd;
+
 void Precondition_Brownian_RFUmultiply(	
-					float *d_y,       // output
-					float *d_x,       // input
+					Scalar *d_y,       // output
+					Scalar *d_x,       // input
 					const Scalar4 *d_pos,
 					unsigned int *d_group_members,
 					const int group_size, 
@@ -48,15 +70,15 @@ void Precondition_Brownian_RFUmultiply(
 					);
 
 void Precondition_Brownian_Undo(	
-				float *d_x,       // input/output
+				Scalar *d_x,       // input/output
 				int group_size,
 				KernelData *ker_data,
 				ResistanceData *res_data
 				);
 
 void Precondition_Saddle_RFUmultiply(	
-					float *d_y,       // output
-					float *d_x,       // input
+					Scalar *d_y,       // output
+					Scalar *d_x,       // input
 					float *d_Scratch, // intermediate storage
 					const int *d_prcm,
 					int group_size,

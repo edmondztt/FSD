@@ -4,9 +4,11 @@
 
 #include "Helper_Integrator.cuh"
 
-#include "hoomd/Saru.h"
+#include "hoomd/RNGIdentifiers.h"
+#include "hoomd/RandomNumbers.h"
+
 #include "hoomd/TextureTools.h"
-using namespace hoomd;
+
 
 #include <stdio.h>
 #include <math.h>
@@ -19,6 +21,7 @@ using namespace hoomd;
 #else
 #include <assert.h>
 #endif
+
 
 
 /*! 
@@ -36,10 +39,20 @@ using namespace hoomd;
 	seed		(input)  seed for random number generation
 
 */
+
+namespace hoomd
+{
+namespace md
+{
+
 __global__ void Integrator_RFD_RandDisp_kernel(
 								float *d_psi,
 								unsigned int N,
-								const unsigned int seed
+								
+								// Edmond 03/31/2023 : rand number now passed in seed & timestep
+								// const unsigned int seed
+								uint64_t timestep,
+								uint16_t seed
 								){
 
 	int idx = blockDim.x * blockIdx.x + threadIdx.x;
@@ -47,19 +60,25 @@ __global__ void Integrator_RFD_RandDisp_kernel(
 	// Check if thread is in bounds
 	if (idx < N) {
 
-		// Initialize random seed
-                detail::Saru s(idx, seed);
-
+		// // Initialize random seed
+        //         detail::Saru s(idx, seed);
+		// Edmond 03/31/2023:
+		// uint16_t seed = m_sysdef->getSeed();
+		// Initialize the RNG
+		RandomGenerator rng(hoomd::Seed(50, timestep, seed),
+			hoomd::Counter(idx));
 		// Square root of 3
 		float sqrt3 = 1.732050807568877;
 		
 		// Call the random number generator
-		float x1 = s.f( -sqrt3, sqrt3 );
-		float y1 = s.f( -sqrt3, sqrt3 );
-		float z1 = s.f( -sqrt3, sqrt3 );
-		float x2 = s.f( -sqrt3, sqrt3 );
-		float y2 = s.f( -sqrt3, sqrt3 );
-		float z2 = s.f( -sqrt3, sqrt3 );
+		// Edmond 03/31/2023:
+		hoomd::UniformDistribution<Scalar> uniform(Scalar(-sqrt3), Scalar(sqrt3));
+		float x1 = uniform(rng);
+		float y1 = uniform(rng);
+		float z1 = uniform(rng);
+		float x2 = uniform(rng);
+		float y2 = uniform(rng);
+		float z2 = uniform(rng);
 
 		// Write to output
 		d_psi[ 6*idx + 0 ] = x1;
@@ -135,3 +154,6 @@ __global__ void Integrator_AddStrainRate_kernel(
 
 	}
 }
+
+}	// end namespace md
+}	// end namespace hoomd

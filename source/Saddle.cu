@@ -49,6 +49,7 @@
 #endif
 
 
+
 /*
 	Define the saddle point matrix describing Stokesian Dynamics,
 	i.e. it describes the relationship Ax=b (rather than constructing the matrix A).
@@ -76,6 +77,12 @@ scalar4_tex_t pos_tex;
 */
 
 //zhoge// Referenced by cuspSaddle in Wrappers.cuh
+
+namespace hoomd
+{
+namespace md
+{
+
 
 void Saddle_Multiply( 
                         	float *d_b, // output
@@ -262,3 +269,6 @@ void Saddle_Preconditioner(
 	d_Scratch = NULL;
 		
 }
+
+}	// end namespace md
+}	// end namespace hoomd

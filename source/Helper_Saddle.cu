@@ -22,7 +22,6 @@
 #define __scalar2int_rd __double2int_rd
 #endif
 
-
 /*! \file Helper_Saddle.cu
 	Helper functions to perform the additions and operations required in the saddle point
 	matrix calculations
@@ -34,6 +33,12 @@
 	d_b	(input/output) 	vector zeroed upon output
    	N	(input) 	number of particles
 */
+
+namespace hoomd
+{
+namespace md
+{
+
 __global__ void Saddle_ZeroOutput_kernel( 
 						float *d_b,
 						unsigned int N
@@ -263,3 +268,6 @@ __global__ void Saddle_solution2vel_kernel(
 
 
 
+
+}	// end namespace md
+}	// end namespace hoomd

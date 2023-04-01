@@ -36,6 +36,7 @@
 #define __scalar2int_rd __double2int_rd
 #endif
 
+
 /*
 	Construct the saddle point matrix, the preconditioner matrix, and do the
 	preconditioned solve, all in one wrapper function.
@@ -52,6 +53,12 @@
 	res_data		(input)  structure containing information for resistance calculation
 
 */
+
+namespace hoomd
+{
+namespace md
+{
+
 void Solvers_Saddle(
 			float *d_rhs, 
 			float *d_solution,
@@ -125,3 +132,6 @@ void Solvers_Saddle(
 	  }
 	
 }
+
+}	// end namespace md
+}	// end namespace hoomd

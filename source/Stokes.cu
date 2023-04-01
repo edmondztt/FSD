@@ -115,6 +115,12 @@ scalar4_tex_t tables1_tex;
 	work_data	(input)		structure containing data for scratch arrays and workspaces
 */
 
+namespace hoomd
+{
+namespace md
+{
+
+
 cudaError_t Stokes_StepOne(     unsigned int timestep,
 				unsigned int output_period,
 				Scalar4 *d_pos,
@@ -372,3 +378,6 @@ cudaError_t Stokes_StepOne(     unsigned int timestep,
 
 
 }
+
+}	// end namespace md
+}	// end namespace hoomd

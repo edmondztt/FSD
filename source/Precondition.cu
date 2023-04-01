@@ -43,6 +43,7 @@
 #endif
 
 
+
 /*
 	This file defines functions required to build the Preconditioner
 	for the lubrication and saddle point problems,
@@ -67,6 +68,12 @@
 	rp			(input)  cutoff radius for the preconditioner
 
 */
+
+namespace hoomd
+{
+namespace md
+{
+
 __global__ void Precondition_GetPrunedNneigh_kernel( 	
 							unsigned int *d_nneigh_pruned, 
 							const unsigned int group_size,
@@ -1858,3 +1865,6 @@ void Precondition_Saddle_RFUmultiply(
 
 }
 
+
+}	// end namespace md
+}	// end namespace hoomd
