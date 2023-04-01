@@ -71,11 +71,11 @@ inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=t
 
 using namespace hoomd;
 
-void Debug_HasNaN( float *d_vec, int N );
+void Debug_HasNaN( Scalar *d_vec, int N );
 
-void Debug_HasZeroDiag( float *d_Diag, int N );
+void Debug_HasZeroDiag( Scalar *d_Diag, int N );
 
-void Debug_CSRzeroDiag( int *d_RowPtr, int *d_ColInd, float *d_Val, int group_size, int nnz );
+void Debug_CSRzeroDiag( int *d_RowPtr, int *d_ColInd, Scalar *d_Val, int group_size, int nnz );
 
 void Debug_StatusCheck_cuSparse( cusparseStatus_t spStatus, const char *name );
 
@@ -83,13 +83,13 @@ void Debug_StatusCheck_cuSolver( cusolverStatus_t soStatus );
 
 void Debug_PrintVector_Int( int *d_vec, int N, const char *name );
 
-void Debug_PrintVector_Float( float *d_vec, int N, const char *name );
+void Debug_PrintVector_Float( Scalar *d_vec, int N, const char *name );
 
-void Debug_PrintVector_CSR( float *d_Val, int *d_RowPtr, int *d_ColInd, int nrows, int nnz, const char *name );
+void Debug_PrintVector_CSR( Scalar *d_Val, int *d_RowPtr, int *d_ColInd, int nrows, int nnz, const char *name );
 
-void Debug_PrintVector_CSR_forMatlab( int *d_RowPtr, int *d_ColInd, float *d_Val, int nrows, int nnz );
+void Debug_PrintVector_CSR_forMatlab( int *d_RowPtr, int *d_ColInd, Scalar *d_Val, int nrows, int nnz );
 
-void Debug_PrintVector_COO( float *d_Val, int *d_RowInd, int *d_ColInd, int nnz, const char *name );
+void Debug_PrintVector_COO( Scalar *d_Val, int *d_RowInd, int *d_ColInd, int nnz, const char *name );
 
 void Debug_PrintVector_SpIndexing( const unsigned int *d_n_neigh, const unsigned int *d_offset, const unsigned int *d_NEPP, int N );
 
@@ -127,7 +127,7 @@ void Debug_Random_Dss1(
 			int group_size,
 			int3 *d_image,
 			const BoxDim box,
-			float dt
+			Scalar dt
 			);
 
 void Debug_Random_Dss2( 
@@ -140,7 +140,7 @@ void Debug_Random_Dss2(
 			int group_size,
 			int3 *d_image,
 			const BoxDim box,
-			float dt
+			Scalar dt
 			);
 
 

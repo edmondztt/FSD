@@ -47,26 +47,26 @@ typedef cufftComplex hipfftComplex;
 using namespace hoomd;
 
 __global__ void Saddle_ZeroOutput_kernel( 
-						float *d_b, 
+						Scalar *d_b, 
 						unsigned int N 
 						);
 
-__global__ void Saddle_AddFloat_kernel( 	float *d_a, 
-						float *d_b,
-						float *d_c,
-						float coeff_a,
-						float coeff_b,
+__global__ void Saddle_AddFloat_kernel( 	Scalar *d_a, 
+						Scalar *d_b,
+						Scalar *d_c,
+						Scalar coeff_a,
+						Scalar coeff_b,
 						unsigned int N,
 						int stride
 					);
 
-__global__ void Saddle_SplitGeneralizedF_kernel( 	float *d_GeneralF, 
+__global__ void Saddle_SplitGeneralizedF_kernel( 	Scalar *d_GeneralF, 
 							Scalar4 *d_net_force,
 							Scalar4 *d_TorqueStress,
 							unsigned int N
 					);
 
-__global__ void Saddle_MakeGeneralizedU_kernel( 	float *d_GeneralU, 
+__global__ void Saddle_MakeGeneralizedU_kernel( 	Scalar *d_GeneralU, 
 							Scalar4 *d_vel,
 							Scalar4 *d_AngvelStrain,
 							unsigned int N
@@ -74,14 +74,14 @@ __global__ void Saddle_MakeGeneralizedU_kernel( 	float *d_GeneralU,
 
 
 __global__ void Saddle_force2rhs_kernel(
-					float *d_force, 
-					float *d_rhs,
+					Scalar *d_force, 
+					Scalar *d_rhs,
 					unsigned int N
 					);
 
 __global__ void Saddle_solution2vel_kernel(
-					float *d_U, 
-					float *d_solution,
+					Scalar *d_U, 
+					Scalar *d_solution,
 					unsigned int N
 					);
 

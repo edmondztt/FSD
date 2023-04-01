@@ -32,9 +32,9 @@
 #include <assert.h>
 #endif
 
-//! command to convert floats or doubles to integers
+//! command to convert Scalars or doubles to integers
 #ifdef SINGLE_PRECISION
-#define __scalar2int_rd __float2int_rd
+#define __scalar2int_rd __Scalar2int_rd
 #else
 #define __scalar2int_rd __double2int_rd
 #endif
@@ -54,11 +54,11 @@ extern __shared__ Scalar partial_sum[];
 /*! 
 	CUSP shell to apply matrix-free multiplication of the saddle point matrix
 */
-class cuspSaddle : public cusp::linear_operator<float,cusp::device_memory>
+class cuspSaddle : public cusp::linear_operator<Scalar,cusp::device_memory>
 {
 public:
 
-	typedef cusp::linear_operator<float,cusp::device_memory> super; //!< Defines size of linear operator
+	typedef cusp::linear_operator<Scalar,cusp::device_memory> super; //!< Defines size of linear operator
 
         // No need to specify their values because it's the relationship that matters
 	Scalar *d_x;   //!< input vector (unspecified)
@@ -104,8 +104,8 @@ public:
 	{
 	
 		// Raw pointer to device memory for input and output arrays
-		d_x = (float*)thrust::raw_pointer_cast(&x[0]);
-		d_y = (float*)thrust::raw_pointer_cast(&y[0]);
+		d_x = (Scalar*)thrust::raw_pointer_cast(&x[0]);
+		d_y = (Scalar*)thrust::raw_pointer_cast(&y[0]);
 	
 		// Call the kernel	
 		Saddle_Multiply( 
@@ -129,11 +129,11 @@ public:
 /*! 
 	CUSP shell to apply the action of the preconditioner to a vector. P^(-1) * vec
 */
-class cuspSaddlePreconditioner : public cusp::linear_operator<float,cusp::device_memory>
+class cuspSaddlePreconditioner : public cusp::linear_operator<Scalar,cusp::device_memory>
 {
 public:
 
-	typedef cusp::linear_operator<float,cusp::device_memory> super; //!< Defines size of linear operator
+	typedef cusp::linear_operator<Scalar,cusp::device_memory> super; //!< Defines size of linear operator
 	
 	Scalar *d_x;   //!< input vector
 	Scalar *d_y;   //!< output vector
@@ -168,8 +168,8 @@ public:
 	{
 	
 		// Raw pointer to device memory for input and output arrays
-		d_x = (float*)thrust::raw_pointer_cast(&x[0]);
-		d_y = (float*)thrust::raw_pointer_cast(&y[0]);
+		d_x = (Scalar*)thrust::raw_pointer_cast(&x[0]);
+		d_y = (Scalar*)thrust::raw_pointer_cast(&y[0]);
 	
 		// Call the kernel
 		Saddle_Preconditioner(	

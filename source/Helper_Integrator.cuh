@@ -43,17 +43,17 @@ typedef cufftComplex hipfftComplex;
 using namespace hoomd;
 
 __global__ void Integrator_RFD_RandDisp_kernel(
-						float *d_psi,
+						Scalar *d_psi,
 						unsigned int N,
 						const unsigned int seed
 						);
 __global__ void Integrator_ZeroVelocity_kernel( 
-						float *d_b,
+						Scalar *d_b,
 						unsigned int N
 						);
 __global__ void Integrator_AddStrainRate_kernel( 
-						float *d_b,
-						float shear_rate,
+						Scalar *d_b,
+						Scalar shear_rate,
 						unsigned int N
 						);
 

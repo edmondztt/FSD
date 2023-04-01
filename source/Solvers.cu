@@ -29,9 +29,9 @@
 #include <assert.h>
 #endif
 
-//! command to convert floats or doubles to integers
+//! command to convert Scalars or doubles to integers
 #ifdef SINGLE_PRECISION
-#define __scalar2int_rd __float2int_rd
+#define __scalar2int_rd __Scalar2int_rd
 #else
 #define __scalar2int_rd __double2int_rd
 #endif
@@ -60,13 +60,13 @@ namespace md
 {
 
 void Solvers_Saddle(
-			float *d_rhs, 
-			float *d_solution,
+			Scalar *d_rhs, 
+			Scalar *d_solution,
 			Scalar4 *d_pos,
 			unsigned int *d_group_members,
 			unsigned int group_size,
 			const BoxDim& box,
-			float tol,
+			Scalar tol,
 			void *pBuffer,
 			KernelData *ker_data,
 			MobilityData *mob_data,
@@ -95,11 +95,11 @@ void Solvers_Saddle(
 						);
 
 	// Wrap raw pointers for solution (initial guess) and RHS with thrust::device_ptr
-	thrust::device_ptr<float> d_x( d_solution );
-	thrust::device_ptr<float> d_b( d_rhs );
+	thrust::device_ptr<Scalar> d_x( d_solution );
+	thrust::device_ptr<Scalar> d_b( d_rhs );
 
 	// Wrap thrust device pointers in cusp array1d_view
-	typedef typename cusp::array1d_view< thrust::device_ptr<float> > DeviceArrayView;
+	typedef typename cusp::array1d_view< thrust::device_ptr<Scalar> > DeviceArrayView;
 	DeviceArrayView x (d_x, d_x + 17*group_size );
 	DeviceArrayView b (d_b, d_b + 17*group_size );
 
@@ -110,12 +110,12 @@ void Solvers_Saddle(
 	//      Converge if residual norm || b - A*x || <= abs_tol + rel_tol * || b ||
 	//
 	int iter_limit = 1000;
-	float rel_tol  = tol;
-	float abs_tol  = 0.0;
+	Scalar rel_tol  = tol;
+	Scalar abs_tol  = 0.0;
 	bool verbose_flag = false;
-	//cusp::default_monitor<float> monitor(b, iter_limit, tol);
-	//cusp::verbose_monitor<float> monitor(b, iter_limit, tol);
-	cusp::monitor<float> monitor(b, iter_limit, rel_tol, abs_tol, verbose_flag);
+	//cusp::default_monitor<Scalar> monitor(b, iter_limit, tol);
+	//cusp::verbose_monitor<Scalar> monitor(b, iter_limit, tol);
+	cusp::monitor<Scalar> monitor(b, iter_limit, rel_tol, abs_tol, verbose_flag);
 
 	// solve the linear system A * x = b using GMRES
 	//

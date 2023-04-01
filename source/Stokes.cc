@@ -139,7 +139,7 @@ void Stokes::setParams()
 	// Check that rcut is not too large (otherwise interact with images)
 	if ( ( m_ewald_cut > L.x/2.0 ) || ( m_ewald_cut > L.y/2.0 ) || ( m_ewald_cut > L.z/2.0 ) ){
 		
-		float max_cut;
+		Scalar max_cut;
 		if ( ( L.x < L.y ) && ( L.x < L.z ) ){
 			max_cut = L.x / 2.0;
 		}
@@ -153,7 +153,7 @@ void Stokes::setParams()
 			max_cut = L.x / 2.0;
 		}
 
-		float new_xi = sqrtf( -logf( m_error ) ) / max_cut;
+		Scalar new_xi = sqrtf( -logf( m_error ) ) / max_cut;
 
 		printf("Real space Ewald cutoff radius is too large! \n");
 		printf("    xi = %f \n    rcut = %f \n    box = ( %f %f %f ) \n", m_xi, m_ewald_cut, L.x, L.y, L.z );
@@ -354,7 +354,7 @@ void Stokes::setParams()
 	m_ewald_n = m_ewald_cut / m_ewald_dr - 1;  // Number of entries in tabulation
 
 	// Table discretization in quadruple precision
-	__float128 dr = 0.00100000000000000000000000000000;
+	Scalar dr = 0.00100000000000000000000000000000;
 
 	// Factors needed to compute self contribution
         Scalar pi12 = 1.77245385091; // square root of pi
@@ -379,9 +379,9 @@ void Stokes::setParams()
 
 	// Functions are complicated so calculation should be done in quadruple precision, then truncated to single precision
 	// in order to ensure accurate evaluation
-	__float128 xi  = m_xi;
-	__float128 Pi = 3.1415926535897932384626433832795;
-	__float128 a = aa;
+	Scalar xi  = m_xi;
+	Scalar Pi = 3.1415926535897932384626433832795;
+	Scalar a = aa;
 
 	// Fill tables
 	for ( int kk = 0; kk < nR; kk++ ) 
@@ -398,14 +398,14 @@ void Stokes::setParams()
 		h_ewaldC1.data[ 2*kk + 1 ].w = 0.0; // extra 
 
 		// Distance for current entry
-		__float128 r = __float128( kk ) * dr + dr;
-		__float128 Imrr = 0.00000000000000000000000000000000;
-		__float128 rr   = 0.00000000000000000000000000000000;
-		__float128 g1   = 0.00000000000000000000000000000000;
-		__float128 g2   = 0.00000000000000000000000000000000;
-		__float128 h1   = 0.00000000000000000000000000000000;
-		__float128 h2   = 0.00000000000000000000000000000000;
-		__float128 h3   = 0.00000000000000000000000000000000;
+		Scalar r = Scalar( kk ) * dr + dr;
+		Scalar Imrr = 0.00000000000000000000000000000000;
+		Scalar rr   = 0.00000000000000000000000000000000;
+		Scalar g1   = 0.00000000000000000000000000000000;
+		Scalar g2   = 0.00000000000000000000000000000000;
+		Scalar h1   = 0.00000000000000000000000000000000;
+		Scalar h2   = 0.00000000000000000000000000000000;
+		Scalar h3   = 0.00000000000000000000000000000000;
 		
 
 		// Expression have been simplified assuming no overlap, touching, and overlap
@@ -681,8 +681,8 @@ void Stokes::setParams()
 	// Particle linear/angular velocities, plus stresslet
 	unsigned int group_size = m_group->getNumMembers();
 
-	GPUArray<float> n_AppliedForce( 6*group_size, m_exec_conf);
-	GPUArray<float> n_Velocity( 11*group_size, m_exec_conf);
+	GPUArray<Scalar> n_AppliedForce( 6*group_size, m_exec_conf);
+	GPUArray<Scalar> n_Velocity( 11*group_size, m_exec_conf);
  
 	m_AppliedForce.swap(n_AppliedForce);
 	m_Velocity.swap(n_Velocity);
@@ -699,13 +699,13 @@ void Stokes::OutputData( unsigned int timestep, BoxDim box, Scalar current_shear
   Scalar volume = box.getVolume();
   unsigned int N = m_pdata->getN();	
 
-  float nden  = N/volume;              //number density
-  float sr    = 1.0;                   //(maximal) shear rate
-  float F_0   = sr/m_ndsr;             //electrostatic repulsion scale
-  float Hamaker = F_0*m_beta;          //Hamaker constant for vdW
-  float epsq    = m_epsq;              //square of the regularization term for vdW
-  //float F_0   = 0.001;               //Brady's repulsion factor
-  //float r_c   = 0.001;               //Brady's repulsion range
+  Scalar nden  = N/volume;              //number density
+  Scalar sr    = 1.0;                   //(maximal) shear rate
+  Scalar F_0   = sr/m_ndsr;             //electrostatic repulsion scale
+  Scalar Hamaker = F_0*m_beta;          //Hamaker constant for vdW
+  Scalar epsq    = m_epsq;              //square of the regularization term for vdW
+  //Scalar F_0   = 0.001;               //Brady's repulsion factor
+  //Scalar r_c   = 0.001;               //Brady's repulsion range
 
   // Initial output
   if (timestep == 0) {
@@ -721,7 +721,7 @@ void Stokes::OutputData( unsigned int timestep, BoxDim box, Scalar current_shear
   }
 
   // Access needed data from CPU
-  ArrayHandle<float> h_Velocity(m_Velocity, access_location::host, access_mode::read);
+  ArrayHandle<Scalar> h_Velocity(m_Velocity, access_location::host, access_mode::read);
   
   ArrayHandle<Scalar4> h_pos(      m_pdata->getPositions(), access_location::host, access_mode::read);
   ArrayHandle<Scalar4> h_net_force(m_pdata->getNetForce(),  access_location::host, access_mode::read);
@@ -760,8 +760,8 @@ void Stokes::OutputData( unsigned int timestep, BoxDim box, Scalar current_shear
   // init post-process results
   Scalar max_overlap = 0.0;
   Scalar avr_overlap = 0.0;
-  float  cnt_overlap = 0.0;
-  float  min_gap     = 10.0;
+  Scalar  cnt_overlap = 0.0;
+  Scalar  min_gap     = 10.0;
     
   // Loop through particle indices/tags and write per-particle result to file
   for (unsigned int ii = 0; ii < N; ii++) {
@@ -771,15 +771,15 @@ void Stokes::OutputData( unsigned int timestep, BoxDim box, Scalar current_shear
     unsigned int tag = h_tag_array.data[idx];  
     
     // Access stresslet, position and (net) interparticle force of each particle
-    float * stlt = & h_Velocity.data[ 6*N + 5*idx ];
+    Scalar * stlt = & h_Velocity.data[ 6*N + 5*idx ];
     Scalar4 pos4 = h_pos.data[idx];
     
-    float stress_xx = nden * stlt[0];
-    float stress_xy = nden * stlt[1];
-    float stress_xz = nden * stlt[2];
-    float stress_yz = nden * stlt[3];  //zhoge: should be yz
-    float stress_yy = nden * stlt[4];
-    float stress_zz = -stress_xx-stress_yy;  //By definition, stlt is traceless.    
+    Scalar stress_xx = nden * stlt[0];
+    Scalar stress_xy = nden * stlt[1];
+    Scalar stress_xz = nden * stlt[2];
+    Scalar stress_yz = nden * stlt[3];  //zhoge: should be yz
+    Scalar stress_yy = nden * stlt[4];
+    Scalar stress_zz = -stress_xx-stress_yy;  //By definition, stlt is traceless.    
     
     // Output the hydrodynamic stresslets	
     fprintf (file0, "%7i %12.3e %12.3e %12.3e %12.3e %12.3e %12.3e \n", tag,
@@ -788,12 +788,12 @@ void Stokes::OutputData( unsigned int timestep, BoxDim box, Scalar current_shear
     // Output the position
     fprintf (file1, "%7i %15.6e %15.6e %15.6e \n", tag, pos4.x, pos4.y, pos4.z);
     
-    float stress_repl_xx = 0.0;
-    float stress_repl_xy = 0.0;
-    float stress_repl_xz = 0.0;
-    float stress_repl_yy = 0.0;
-    float stress_repl_yz = 0.0;
-    float stress_repl_zz = 0.0;
+    Scalar stress_repl_xx = 0.0;
+    Scalar stress_repl_xy = 0.0;
+    Scalar stress_repl_xz = 0.0;
+    Scalar stress_repl_yy = 0.0;
+    Scalar stress_repl_yz = 0.0;
+    Scalar stress_repl_zz = 0.0;
 
     // Neighborlist arrays
     unsigned int head_idx = h_headlist_ewald.data[ idx ]; // Location in head array for neighbors of current particle
@@ -842,18 +842,18 @@ void Stokes::OutputData( unsigned int timestep, BoxDim box, Scalar current_shear
       //
       if (dist <= 2.0 + 10.0/m_kappa) {
 	
-	float normalx = R.x/dist;  //from center to neighbor
-	float normaly = R.y/dist;  //from center to neighbor
-	float normalz = R.z/dist;  //from center to neighbor
+	Scalar normalx = R.x/dist;  //from center to neighbor
+	Scalar normaly = R.y/dist;  //from center to neighbor
+	Scalar normalz = R.z/dist;  //from center to neighbor
 
-	float rmax = 2.0 + 1.0*sqrt(epsq);  //Below rmax, collision force is activated to model surface roughness.
-	float gap1 = dist - rmax;  //surface gap for interparticle force calculations
+	Scalar rmax = 2.0 + 1.0*sqrt(epsq);  //Below rmax, collision force is activated to model surface roughness.
+	Scalar gap1 = dist - rmax;  //surface gap for interparticle force calculations
 	
 	if (gap1 >= 0.) {
 	  
-	  float F_app_mag = -F_0 * exp (-gap1*m_kappa);  //electrostatic repulsion, negative
+	  Scalar F_app_mag = -F_0 * exp (-gap1*m_kappa);  //electrostatic repulsion, negative
 	  F_app_mag += Hamaker/(12.*(gap1*gap1 + epsq));  //van der Waals attraction, positive
-      	  //float F_app_mag = F_0/r_c*exp( -(dist-2.0)/r_c )/(1.0-exp( -(dist-2.0)/r_c ));  //always positive  //brady
+      	  //Scalar F_app_mag = F_0/r_c*exp( -(dist-2.0)/r_c )/(1.0-exp( -(dist-2.0)/r_c ));  //always positive  //brady
       	  
       	  stress_repl_xx += nden * (F_app_mag * normalx * R.x)/2.0;  //divide by 2 because pair  
       	  stress_repl_xy += nden * (F_app_mag * normalx * R.y)/2.0;  
@@ -864,7 +864,7 @@ void Stokes::OutputData( unsigned int timestep, BoxDim box, Scalar current_shear
       	}
 	else {
 
-      	  float F_app_mag = Hamaker/(12.*epsq) - F_0 - m_k_n * abs(gap1); //net force at gap1=0 minus collision
+      	  Scalar F_app_mag = Hamaker/(12.*epsq) - F_0 - m_k_n * abs(gap1); //net force at gap1=0 minus collision
       
       	  stress_repl_xx += nden * (F_app_mag * normalx * R.x)/2.0;  //divide by 2 because pair
       	  stress_repl_xy += nden * (F_app_mag * normalx * R.y)/2.0;  
@@ -929,46 +929,46 @@ void Stokes::AllocateWorkSpaces(){
 	// 
 	// Total Memory required for the arrays declared in this function:
 	// 	
-	//	sizeof(float) = sizeof(int) = 4 bytes
+	//	sizeof(Scalar) = sizeof(int) = 4 bytes
 	//	
 	//	nnz = 468 * N 
 	//	mmax = 100	
 	//
 	//	Variable		Length		Type
 	//	--------		------		----
-	//	dot_sum			512		float
-	//	bro_ff_psi		3*N		float4
-	//	bro_ff_UBreal		3*N		float4
-	//	bro_ff_Tm		mmax		float
-	//	bro_ff_v		3*N		float4
-	//	bro_ff_vj		3*N		float4
-	//	bro_ff_vjm1		3*N		float4
-	//	bro_ff_Mvj 		3*N		float4
-	//	bro_ff_V		3*mmax*N	float4
-	//	bro_ff_UB_old		3*N		float4
-	//	bro_ff_Mpsi	 	3*N		float4
-	//	bro_nf_Tm		m_max 		float
-	//	bro_nf_v		6*N		float
-	//	bro_nf_V		(mmax+1)*6*N	float
-	//	bro_nf_FB_old 		6*N	 	float
-	//	bro_nf_Psi 		6*N		float
-	//	saddle_psi		6*N		float
-	//	saddle_posPrime		N		float4
-	//	saddle_rhs 		17*N		float
-	//	saddle_solution 	17*N		float
-	//	mob_couplet		2*N		float4
-	//	mob_delu		2*N		float4
-	//	mob_vel1		N		float4
-	//	mob_vel2		N		float4
-	//	mob_delu1		2*N		float4
-	//	mob_delu2		2*N		float4
-	//	mob_vel			N		float4
-	//	mob_AngvelStrain	2*N		float4
-	//	mob_net_force		N		float4
-	//	mob_TorqueStress	2*N		float4
+	//	dot_sum			512		Scalar
+	//	bro_ff_psi		3*N		Scalar4
+	//	bro_ff_UBreal		3*N		Scalar4
+	//	bro_ff_Tm		mmax		Scalar
+	//	bro_ff_v		3*N		Scalar4
+	//	bro_ff_vj		3*N		Scalar4
+	//	bro_ff_vjm1		3*N		Scalar4
+	//	bro_ff_Mvj 		3*N		Scalar4
+	//	bro_ff_V		3*mmax*N	Scalar4
+	//	bro_ff_UB_old		3*N		Scalar4
+	//	bro_ff_Mpsi	 	3*N		Scalar4
+	//	bro_nf_Tm		m_max 		Scalar
+	//	bro_nf_v		6*N		Scalar
+	//	bro_nf_V		(mmax+1)*6*N	Scalar
+	//	bro_nf_FB_old 		6*N	 	Scalar
+	//	bro_nf_Psi 		6*N		Scalar
+	//	saddle_psi		6*N		Scalar
+	//	saddle_posPrime		N		Scalar4
+	//	saddle_rhs 		17*N		Scalar
+	//	saddle_solution 	17*N		Scalar
+	//	mob_couplet		2*N		Scalar4
+	//	mob_delu		2*N		Scalar4
+	//	mob_vel1		N		Scalar4
+	//	mob_vel2		N		Scalar4
+	//	mob_delu1		2*N		Scalar4
+	//	mob_delu2		2*N		Scalar4
+	//	mob_vel			N		Scalar4
+	//	mob_AngvelStrain	2*N		Scalar4
+	//	mob_net_force		N		Scalar4
+	//	mob_TorqueStress	2*N		Scalar4
 	//	precond_scratch 	N		int
 	//	precond_map 		nnz		int
-	//	precond_backup	 	nnz		float
+	//	precond_backup	 	nnz		Scalar
 	//
 	//				2963*N+712 \approx 2963*N
 	//
@@ -1019,12 +1019,12 @@ void Stokes::AllocateWorkSpaces(){
 	cudaMalloc( (void**)&m_work_bro_nf_v,		6*group_size * sizeof(Scalar) );
 	cudaMalloc( (void**)&m_work_bro_nf_V,		(m_max+1) * 6*group_size * sizeof(Scalar) );
 	cudaMalloc( (void**)&m_work_bro_nf_FB_old, 	6*group_size * sizeof(Scalar) );
-	cudaMalloc( (void**)&m_work_bro_nf_Psi, 	6*group_size*sizeof(float) );
+	cudaMalloc( (void**)&m_work_bro_nf_Psi, 	6*group_size*sizeof(Scalar) );
 
-	cudaMalloc( (void**)&m_work_saddle_psi,		6*group_size*sizeof(float) );
+	cudaMalloc( (void**)&m_work_saddle_psi,		6*group_size*sizeof(Scalar) );
 	cudaMalloc( (void**)&m_work_saddle_posPrime,	group_size*sizeof(Scalar4) );
-	cudaMalloc( (void**)&m_work_saddle_rhs, 	17*group_size*sizeof(float) );
-	cudaMalloc( (void**)&m_work_saddle_solution, 	17*group_size*sizeof(float) );
+	cudaMalloc( (void**)&m_work_saddle_rhs, 	17*group_size*sizeof(Scalar) );
+	cudaMalloc( (void**)&m_work_saddle_solution, 	17*group_size*sizeof(Scalar) );
 
 	cudaMalloc( (void**)&m_work_mob_couplet,	2*group_size*sizeof(Scalar4) );
 	cudaMalloc( (void**)&m_work_mob_delu,		2*group_size*sizeof(Scalar4) );
@@ -1107,8 +1107,8 @@ void Stokes::FreeWorkSpaces(){
 
 */
 void Stokes::setFriction( std::string friction_type,
-			  float h0, 
-			  std::vector<float> &alpha) {
+			  Scalar h0, 
+			  std::vector<Scalar> &alpha) {
 
 	// Get handles to the resistance data
     ArrayHandle<Scalar> h_ResTable_dist(m_ResTable_dist, access_location::host, access_mode::read);
@@ -1125,24 +1125,24 @@ void Stokes::setFriction( std::string friction_type,
 		{
 			
 			// Current gap width
-			float h = h_ResTable_dist.data[ii] - 2.0;
+			Scalar h = h_ResTable_dist.data[ii] - 2.0;
 
 			// If current distance is less than frictional distance, add to it
 			if ( h <= h0 ){
 
 				// Powers of h and h0
-				float h2 = h * h;
+				Scalar h2 = h * h;
 
-				float h02 = h0 * h0;
-				float h03 = h0 * h02;
+				Scalar h02 = h0 * h0;
+				Scalar h03 = h0 * h02;
 
 				// Friction coefficient
-				float YA11 = alpha[0] * ( 2.0 / h03 * h2 - 3.0 / h02 * h + 1.0 / h );
-				float YA12 = alpha[1] * ( 2.0 / h03 * h2 - 3.0 / h02 * h + 1.0 / h );
-				float YB11 = alpha[2] * ( 2.0 / h03 * h2 - 3.0 / h02 * h + 1.0 / h );
-				float YB12 = alpha[3] * ( 2.0 / h03 * h2 - 3.0 / h02 * h + 1.0 / h );
-				float YC11 = alpha[4] * ( 2.0 / h03 * h2 - 3.0 / h02 * h + 1.0 / h );
-				float YC12 = alpha[5] * ( 2.0 / h03 * h2 - 3.0 / h02 * h + 1.0 / h );
+				Scalar YA11 = alpha[0] * ( 2.0 / h03 * h2 - 3.0 / h02 * h + 1.0 / h );
+				Scalar YA12 = alpha[1] * ( 2.0 / h03 * h2 - 3.0 / h02 * h + 1.0 / h );
+				Scalar YB11 = alpha[2] * ( 2.0 / h03 * h2 - 3.0 / h02 * h + 1.0 / h );
+				Scalar YB12 = alpha[3] * ( 2.0 / h03 * h2 - 3.0 / h02 * h + 1.0 / h );
+				Scalar YC11 = alpha[4] * ( 2.0 / h03 * h2 - 3.0 / h02 * h + 1.0 / h );
+				Scalar YC12 = alpha[5] * ( 2.0 / h03 * h2 - 3.0 / h02 * h + 1.0 / h );
 
 				// Add to arrays. Minus signs account for sign of coefficients (add in magnitude)
 				int curr_offset = 22 * ii;
@@ -1232,8 +1232,8 @@ void Stokes::integrateStepOne(unsigned int timestep)
 	ArrayHandle<CUFFTCOMPLEX> d_gridZY(m_gridZY, access_location::device, access_mode::read); //GPUdebug
 
 	// Linear/angular velocities and applied force/torque
-	ArrayHandle<float> d_AppliedForce(m_AppliedForce, access_location::device, access_mode::overwrite); //GPUdebug
-	ArrayHandle<float> d_Velocity(    m_Velocity,     access_location::device, access_mode::overwrite); //GPUdebug
+	ArrayHandle<Scalar> d_AppliedForce(m_AppliedForce, access_location::device, access_mode::overwrite); //GPUdebug
+	ArrayHandle<Scalar> d_Velocity(    m_Velocity,     access_location::device, access_mode::overwrite); //GPUdebug
 
 	// Real space interaction tabulation
 	ArrayHandle<Scalar4> d_ewaldC1(m_ewaldC1, access_location::device, access_mode::read);
@@ -1242,8 +1242,8 @@ void Stokes::integrateStepOne(unsigned int timestep)
 	ArrayHandle<int>   d_L_RowInd( m_L_RowInd, access_location::device, access_mode::overwrite ); //GPUdebug
 	ArrayHandle<int>   d_L_RowPtr( m_L_RowPtr, access_location::device, access_mode::overwrite ); //GPUdebug
 	ArrayHandle<int>   d_L_ColInd( m_L_ColInd, access_location::device, access_mode::overwrite ); //GPUdebug
-	ArrayHandle<float> d_L_Val(    m_L_Val,    access_location::device, access_mode::overwrite ); //GPUdebug	
-	ArrayHandle<float> d_Diag(     m_Diag,     access_location::device, access_mode::overwrite ); //GPUdebug
+	ArrayHandle<Scalar> d_L_Val(    m_L_Val,    access_location::device, access_mode::overwrite ); //GPUdebug	
+	ArrayHandle<Scalar> d_Diag(     m_Diag,     access_location::device, access_mode::overwrite ); //GPUdebug
 	ArrayHandle<int>   d_HasNeigh( m_HasNeigh, access_location::device, access_mode::overwrite ); //GPUdebug
 	
 	ArrayHandle<Scalar> d_ResTable_dist( m_ResTable_dist, access_location::device, access_mode::read );
@@ -1253,9 +1253,9 @@ void Stokes::integrateStepOne(unsigned int timestep)
 	ArrayHandle<unsigned int> d_NEPP(        m_NEPP,        access_location::device, access_mode::overwrite ); //GPUdebug	
 	ArrayHandle<unsigned int> d_offset(      m_offset,      access_location::device, access_mode::overwrite ); //GPUdebug	
 
-	ArrayHandle<float> d_Scratch1( m_Scratch1, access_location::device, access_mode::overwrite ); //GPUdebug
-	ArrayHandle<float> d_Scratch2( m_Scratch2, access_location::device, access_mode::overwrite ); //GPUdebug
-	ArrayHandle<float> d_Scratch3( m_Scratch3, access_location::device, access_mode::overwrite ); //GPUdebug
+	ArrayHandle<Scalar> d_Scratch1( m_Scratch1, access_location::device, access_mode::overwrite ); //GPUdebug
+	ArrayHandle<Scalar> d_Scratch2( m_Scratch2, access_location::device, access_mode::overwrite ); //GPUdebug
+	ArrayHandle<Scalar> d_Scratch3( m_Scratch3, access_location::device, access_mode::overwrite ); //GPUdebug
 	ArrayHandle<int>   d_prcm(     m_prcm,     access_location::device, access_mode::overwrite ); //GPUdebug
 
 	// Randomize seeds for stochastic calculations
@@ -1275,7 +1275,7 @@ void Stokes::integrateStepOne(unsigned int timestep)
 					m_seed_rfd,
 					m_m_Lanczos_ff,
 					m_m_Lanczos_nf,
-					float((*m_T)(timestep)), // Edmond 03/31/2023 for v3 interface
+					Scalar((*m_T)(timestep)), // Edmond 03/31/2023 for v3 interface
 					m_rfd_epsilon
 					};
 	BrownianData *bro_data = &bro_struct;

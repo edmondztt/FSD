@@ -52,7 +52,7 @@ using namespace hoomd;
 extern "C" __global__ void Integrator_ExplicitEuler_kernel(	
 								Scalar4 *d_pos_in,
 								Scalar4 *d_pos_out,
-                             					float *d_Velocity,
+                             					Scalar *d_Velocity,
                              					int3 *d_image,
                              					unsigned int *d_group_members,
                              					unsigned int group_size,
@@ -63,7 +63,7 @@ extern "C" __global__ void Integrator_ExplicitEuler_kernel(
 extern "C" __global__ void Integrator_ExplicitEuler_Shear_kernel(
 								 Scalar4 *d_pos_in,
 								 Scalar4 *d_pos_out,
-								 float *d_Velocity,
+								 Scalar *d_Velocity,
 								 int3 *d_image,
 								 unsigned int *d_group_members,
 								 unsigned int group_size,
@@ -76,7 +76,7 @@ extern "C" __global__ void Integrator_ExplicitEuler_Shear_kernel(
 extern "C" __global__ void Integrator_RK_Shear_kernel(Scalar coef_1, Scalar4 *d_pos_in_1,
 						      Scalar coef_2, Scalar4 *d_pos_in_2,
 						      Scalar4 *d_pos_out,
-						      float *d_Velocity,
+						      Scalar *d_Velocity,
 						      int3 *d_image,
 						      unsigned int *d_group_members,
 						      unsigned int group_size,
@@ -86,7 +86,7 @@ extern "C" __global__ void Integrator_RK_Shear_kernel(Scalar coef_1, Scalar4 *d_
 						      );
 
 
-extern "C" __global__ void Integrator_buffer_vel_kernel(float *d_Velocity,
+extern "C" __global__ void Integrator_buffer_vel_kernel(Scalar *d_Velocity,
 							Scalar3 *vel_rk,
 							unsigned int *d_group_members,
 							unsigned int group_size
@@ -96,7 +96,7 @@ extern "C" __global__ void Integrator_supim_kernel(Scalar3 *vel_rk1,
 						   Scalar3 *vel_rk2,  
 						   Scalar3 *vel_rk3,  
 						   Scalar3 *vel_rk4,
-						   float *d_Velocity,
+						   Scalar *d_Velocity,
 						   unsigned int *d_group_members,
 						   unsigned int group_size
 						   );
@@ -106,7 +106,7 @@ extern "C" __global__ void Integrator_AB2_Shear_kernel(
 						       unsigned int timestep, Scalar4 *d_vel,
 								Scalar4 *d_pos_in,
 								Scalar4 *d_pos_out,
-                             					float *d_Velocity,
+                             					Scalar *d_Velocity,
                              					int3 *d_image,
                              					unsigned int *d_group_members,
                              					unsigned int group_size,
@@ -116,7 +116,7 @@ extern "C" __global__ void Integrator_AB2_Shear_kernel(
 								);
 
 void Integrator_RFD(
-			float *d_Divergence, // 11*N (will have some zeros, but they will be ignored later)
+			Scalar *d_Divergence, // 11*N (will have some zeros, but they will be ignored later)
 			Scalar4 *d_pos,
 			int3 *d_image,
 			unsigned int *d_group_members,
@@ -132,10 +132,10 @@ void Integrator_RFD(
 void Integrator_ComputeVelocity(     unsigned int timestep,
 				     unsigned int output_period,
 			
-					float *d_AppliedForce,
-					float *d_Velocity,
-					float dt,
-					float shear_rate,
+					Scalar *d_AppliedForce,
+					Scalar *d_Velocity,
+					Scalar dt,
+					Scalar shear_rate,
 					Scalar4 *d_pos,
 					int3 *d_image,
 					unsigned int *d_group_members,

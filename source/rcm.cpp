@@ -1444,7 +1444,7 @@ int i4_uniform ( int a, int b, int *seed )
 //
 {
   int k;
-  float r;
+  double r;
   int value;
 
   if ( *seed == 0 )
@@ -1464,12 +1464,12 @@ int i4_uniform ( int a, int b, int *seed )
     *seed = *seed + 2147483647;
   }
 
-  r = ( float ) ( *seed ) * 4.656612875E-10;
+  r = ( double ) ( *seed ) * 4.656612875E-10;
 //
 //  Scale R to lie between A-0.5 and B+0.5.
 //
-  r = ( 1.0 - r ) * ( ( float ) ( i4_min ( a, b ) ) - 0.5 )
-    +         r   * ( ( float ) ( i4_max ( a, b ) ) + 0.5 );
+  r = ( 1.0 - r ) * ( ( double ) ( i4_min ( a, b ) ) - 0.5 )
+    +         r   * ( ( double ) ( i4_max ( a, b ) ) + 0.5 );
 //
 //  Use rounding to convert R to an integer between A and B.
 //
@@ -2732,7 +2732,7 @@ int *perm_uniform ( int n, int *seed )
 }
 //****************************************************************************80
 
-float r4_abs ( float x )
+double r4_abs ( double x )
 
 //****************************************************************************80
 //
@@ -2754,12 +2754,12 @@ float r4_abs ( float x )
 //
 //  Parameters:
 //
-//    Input, float X, the quantity whose absolute value is desired.
+//    Input, double X, the quantity whose absolute value is desired.
 //
-//    Output, float R4_ABS, the absolute value of X.
+//    Output, double R4_ABS, the absolute value of X.
 //
 {
-  float value;
+  double value;
 
   if ( 0.0 <= x )
   {
@@ -2773,7 +2773,7 @@ float r4_abs ( float x )
 }
 //****************************************************************************80
 
-int r4_nint ( float x )
+int r4_nint ( double x )
 
 //****************************************************************************80
 //
@@ -2808,7 +2808,7 @@ int r4_nint ( float x )
 //
 //  Parameters:
 //
-//    Input, float X, the value.
+//    Input, double X, the value.
 //
 //    Output, int R4_NINT, the nearest integer to X.
 //

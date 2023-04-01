@@ -67,7 +67,7 @@ namespace md
 extern "C" __global__ void Integrator_ExplicitEuler_kernel(	
 								Scalar4 *d_pos_in,
 								Scalar4 *d_pos_out,
-                             					float *d_Velocity,
+                             					Scalar *d_Velocity,
                              					int3 *d_image,
                              					unsigned int *d_group_members,
                              					unsigned int group_size,
@@ -89,9 +89,9 @@ extern "C" __global__ void Integrator_ExplicitEuler_kernel(
 		Scalar3 pos = make_scalar3(pos4.x, pos4.y, pos4.z);
 		
 		// read the particle's velocity and update position
-		float ux = d_Velocity[ 6*idx ];
-		float uy = d_Velocity[ 6*idx + 1 ];
-		float uz = d_Velocity[ 6*idx + 2 ];
+		Scalar ux = d_Velocity[ 6*idx ];
+		Scalar uy = d_Velocity[ 6*idx + 1 ];
+		Scalar uz = d_Velocity[ 6*idx + 2 ];
 		Scalar3 vel = make_scalar3( ux, uy, uz);
 	
 		Scalar3 dx = vel * dt;
@@ -127,7 +127,7 @@ extern "C" __global__ void Integrator_ExplicitEuler_kernel(
 
 extern "C" __global__ void Integrator_ExplicitEuler_Shear_kernel(Scalar4 *d_pos_in,
 								 Scalar4 *d_pos_out,
-								 float *d_Velocity,
+								 Scalar *d_Velocity,
 								 int3 *d_image,
 								 unsigned int *d_group_members,
 								 unsigned int group_size,
@@ -150,9 +150,9 @@ extern "C" __global__ void Integrator_ExplicitEuler_Shear_kernel(Scalar4 *d_pos_
 		Scalar3 pos = make_scalar3(pos4.x, pos4.y, pos4.z);
 		  
 		// read the particle's velocity and update position
-		float ux = d_Velocity[ 6*idx ];
-		float uy = d_Velocity[ 6*idx + 1 ];
-		float uz = d_Velocity[ 6*idx + 2 ];
+		Scalar ux = d_Velocity[ 6*idx ];
+		Scalar uy = d_Velocity[ 6*idx + 1 ];
+		Scalar uz = d_Velocity[ 6*idx + 2 ];
 		Scalar3 vel = make_scalar3( ux, uy, uz);
 
 	        // Add the shear
@@ -176,7 +176,7 @@ extern "C" __global__ void Integrator_ExplicitEuler_Shear_kernel(Scalar4 *d_pos_
 extern "C" __global__ void Integrator_RK_Shear_kernel(Scalar coef_1, Scalar4 *d_pos_in_1,
 						      Scalar coef_2, Scalar4 *d_pos_in_2,
 						      Scalar4 *d_pos_out,
-						      float *d_Velocity,
+						      Scalar *d_Velocity,
 						      int3 *d_image,
 						      unsigned int *d_group_members,
 						      unsigned int group_size,
@@ -202,9 +202,9 @@ extern "C" __global__ void Integrator_RK_Shear_kernel(Scalar coef_1, Scalar4 *d_
 		Scalar3 pos  = coef_1 * pos1 + coef_2 * pos2; 
 		  
 		// read the particle's velocity and update position
-		float ux = d_Velocity[ 6*idx ];
-		float uy = d_Velocity[ 6*idx + 1 ];
-		float uz = d_Velocity[ 6*idx + 2 ];
+		Scalar ux = d_Velocity[ 6*idx ];
+		Scalar uy = d_Velocity[ 6*idx + 1 ];
+		Scalar uz = d_Velocity[ 6*idx + 2 ];
 		Scalar3 vel = make_scalar3( ux, uy, uz);
 
 	        // Add the shear
@@ -229,7 +229,7 @@ extern "C" __global__ void Integrator_RK_Shear_kernel(Scalar coef_1, Scalar4 *d_
 
 
 
-extern "C" __global__ void Integrator_buffer_vel_kernel(float *d_Velocity,
+extern "C" __global__ void Integrator_buffer_vel_kernel(Scalar *d_Velocity,
 							Scalar3 *vel_rk,
 							unsigned int *d_group_members,
 							unsigned int group_size
@@ -245,9 +245,9 @@ extern "C" __global__ void Integrator_buffer_vel_kernel(float *d_Velocity,
 		unsigned int idx = d_group_members[tidx];
 		  
 		// read the particle's velocity 
-		float ux = d_Velocity[ 6*idx ];
-		float uy = d_Velocity[ 6*idx + 1 ];
-		float uz = d_Velocity[ 6*idx + 2 ];
+		Scalar ux = d_Velocity[ 6*idx ];
+		Scalar uy = d_Velocity[ 6*idx + 1 ];
+		Scalar uz = d_Velocity[ 6*idx + 2 ];
 		
 		// buffer the velocity 
 		vel_rk[idx] = make_scalar3( ux, uy, uz);
@@ -260,7 +260,7 @@ extern "C" __global__ void Integrator_supim_kernel(Scalar3 *vel_rk1,
 						   Scalar3 *vel_rk2,  
 						   Scalar3 *vel_rk3,  
 						   Scalar3 *vel_rk4,
-						   float *d_Velocity,  //output
+						   Scalar *d_Velocity,  //output
 						   unsigned int *d_group_members,
 						   unsigned int group_size
 						   ){
@@ -313,7 +313,7 @@ extern "C" __global__ void Integrator_supim_kernel(Scalar3 *vel_rk1,
 extern "C" __global__ void Integrator_AB2_Shear_kernel(unsigned int timestep, Scalar4 *d_vel,
 						       Scalar4 *d_pos_in,
 						       Scalar4 *d_pos_out,
-                             			       float *d_Velocity,
+                             			       Scalar *d_Velocity,
                              			       int3 *d_image,
                              			       unsigned int *d_group_members,
                              			       unsigned int group_size,
@@ -336,12 +336,12 @@ extern "C" __global__ void Integrator_AB2_Shear_kernel(unsigned int timestep, Sc
 		Scalar3 pos = make_scalar3(pos4.x, pos4.y, pos4.z);
 		
 		// read the particle's current velocity 
-		float ux1 = d_Velocity[ 6*idx ];
-		float uy1 = d_Velocity[ 6*idx + 1 ];
-		float uz1 = d_Velocity[ 6*idx + 2 ];
+		Scalar ux1 = d_Velocity[ 6*idx ];
+		Scalar uy1 = d_Velocity[ 6*idx + 1 ];
+		Scalar uz1 = d_Velocity[ 6*idx + 2 ];
 		
 		// read the particle's previous velocity
-		float ux0,uy0,uz0;
+		Scalar ux0,uy0,uz0;
 		if (timestep == 1) {
 		  ux0 = ux1;
 		  uy0 = uy1;
@@ -353,9 +353,9 @@ extern "C" __global__ void Integrator_AB2_Shear_kernel(unsigned int timestep, Sc
 		}
 
 		// the velocity to update positions
-		float ux = 1.5*ux1 - 0.5*ux0;  
-		float uy = 1.5*uy1 - 0.5*uy0; 
-		float uz = 1.5*uz1 - 0.5*uz0; 
+		Scalar ux = 1.5*ux1 - 0.5*ux0;  
+		Scalar uy = 1.5*uy1 - 0.5*uy0; 
+		Scalar uz = 1.5*uz1 - 0.5*uz0; 
 		
 		Scalar3 vel = make_scalar3( ux, uy, uz);
 
@@ -393,7 +393,7 @@ extern "C" __global__ void Integrator_AB2_Shear_kernel(unsigned int timestep, Sc
 
 */
 void Integrator_RFD(
-			float *d_Divergence, // size=11*N, but only filled from 1:6*N
+			Scalar *d_Divergence, // size=11*N, but only filled from 1:6*N
 			Scalar4 *d_pos,
 			int3 *d_image,
 			unsigned int *d_group_members,
@@ -408,7 +408,7 @@ void Integrator_RFD(
 			){
 	
 	// Displacements for central RFD are (+/-) epsilon/2.0
-	float epsilon = bro_data->rfd_epsilon;
+	Scalar epsilon = bro_data->rfd_epsilon;
 
 	// Get kernel information
 	dim3 grid = ker_data->particle_grid;
@@ -465,7 +465,7 @@ void Integrator_RFD(
 			);
 		
 	//  Copy velocity to Divergence	
-	cudaMemcpy( d_Divergence, &d_solution[11*group_size], 6*group_size*sizeof(float), cudaMemcpyDeviceToDevice );
+	cudaMemcpy( d_Divergence, &d_solution[11*group_size], 6*group_size*sizeof(Scalar), cudaMemcpyDeviceToDevice );
 
 	// Compute the near-field hydrodynamic stresslet
 	Lubrication_RSU_kernel<<< grid, threads >>>(
@@ -539,7 +539,7 @@ void Integrator_RFD(
 	// Take the difference and apply the appropriate scaling
 	// 
 	// Need the -1 because saddle point lower right gives -RFU, not RFU
-	float fac = (bro_data->T) / epsilon;
+	Scalar fac = (bro_data->T) / epsilon;
 	Saddle_AddFloat_kernel<<<grid,threads>>>( d_Divergence, &d_solution[11*group_size], d_Divergence, fac, -fac, group_size, 6 );	
 	Saddle_AddFloat_kernel<<<grid,threads>>>( &d_Divergence[6*group_size], &d_solution[6*group_size], &d_Divergence[6*group_size], fac, -fac, group_size, 5 );	
 	
@@ -576,10 +576,10 @@ void Integrator_RFD(
 void Integrator_ComputeVelocity(     unsigned int timestep,
 				     unsigned int output_period,
 			
-					float *d_AppliedForce,
-					float *d_Velocity,
-					float dt,
-					float shear_rate,
+					Scalar *d_AppliedForce,
+					Scalar *d_Velocity,
+					Scalar dt,
+					Scalar shear_rate,
 					Scalar4 *d_pos,
 					int3 *d_image,
 					unsigned int *d_group_members,

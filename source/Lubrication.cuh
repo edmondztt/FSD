@@ -63,11 +63,11 @@ __global__ void Lubrication_RFU_kernel(
 			      		const BoxDim box,
 					const unsigned int *d_n_neigh, 
 					unsigned int *d_nlist, 
-					const unsigned int *d_headlist, 
+					const long unsigned int *d_headlist, 
 					const Scalar *d_ResTable_dist,
 					const Scalar *d_ResTable_vals,
-					const float ResTable_min,
-					const float ResTable_dr,
+					const Scalar ResTable_min,
+					const Scalar ResTable_dr,
 					const Scalar rlub
 					);
 
@@ -80,11 +80,11 @@ __global__ void Lubrication_RFE_kernel(
 			      		BoxDim box,
 					const unsigned int *d_n_neigh, 
 					unsigned int *d_nlist, 
-					const unsigned int *d_headlist, 
+					const long unsigned int *d_headlist, 
 					const Scalar *d_ResTable_dist,
 					const Scalar *d_ResTable_vals,
-					const float ResTable_min,
-					const float ResTable_dr,
+					const Scalar ResTable_min,
+					const Scalar ResTable_dr,
 					const Scalar rlub
 					);
 
@@ -97,11 +97,11 @@ __global__ void Lubrication_RSU_kernel(
 			      		BoxDim box,
 					const unsigned int *d_n_neigh, 
 					unsigned int *d_nlist, 
-					const unsigned int *d_headlist, 
+					const long unsigned int *d_headlist, 
 					const Scalar *d_ResTable_dist,
 					const Scalar *d_ResTable_vals,
-					const float ResTable_min,
-					const float ResTable_dr,
+					const Scalar ResTable_min,
+					const Scalar ResTable_dr,
 					const Scalar rlub
 					);
 
@@ -112,13 +112,13 @@ __global__ void Lubrication_RSE_kernel(
 					unsigned int *d_group_members,
 					const unsigned int *d_n_neigh, 
 					unsigned int *d_nlist, 
-					const unsigned int *d_headlist, 
+					const long unsigned int *d_headlist, 
 					Scalar4 *d_pos,
 			      		BoxDim box,
 					const Scalar *d_ResTable_dist,
 					const Scalar *d_ResTable_vals,
-					const float ResTable_min,
-					const float ResTable_dr
+					const Scalar ResTable_min,
+					const Scalar ResTable_dr
 					);
 
 __global__ void Lubrication_RSEgeneral_kernel(
@@ -128,13 +128,13 @@ __global__ void Lubrication_RSEgeneral_kernel(
 					unsigned int *d_group_members,
 					const unsigned int *d_n_neigh, 
 					unsigned int *d_nlist, 
-					const unsigned int *d_headlist, 
+					const long unsigned int *d_headlist, 
 					Scalar4 *d_pos,
 			      		BoxDim box,
 					const Scalar *d_ResTable_dist,
 					const Scalar *d_ResTable_vals,
-					const float ResTable_min,
-					const float ResTable_dr
+					const Scalar ResTable_min,
+					const Scalar ResTable_dr
 					);
 
 

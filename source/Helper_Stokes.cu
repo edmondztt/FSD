@@ -12,9 +12,9 @@
 #include <assert.h>
 #endif
 
-//! command to convert floats or doubles to integers
+//! command to convert Scalars or doubles to integers
 #ifdef SINGLE_PRECISION
-#define __scalar2int_rd __float2int_rd
+#define __scalar2int_rd __Scalar2int_rd
 #else
 #define __scalar2int_rd __double2int_rd
 #endif
@@ -43,7 +43,7 @@ namespace md
 
 __global__ void Stokes_SetForce_kernel(
 						Scalar4 *d_net_force,
-						float   *d_AppliedForce,
+						Scalar   *d_AppliedForce,
 						unsigned int group_size,
 						unsigned int *d_group_members
 					){
@@ -70,17 +70,17 @@ __global__ void Stokes_SetForce_kernel(
 
 __global__ void Stokes_SetForce_manually_kernel(
 						const Scalar4 *d_pos,     //input
-						float   *d_AppliedForce,  //output
+						Scalar   *d_AppliedForce,  //output
 						unsigned int group_size,
 						unsigned int *d_group_members,
 						const unsigned int *d_nneigh, 
 						unsigned int *d_nlist, 
 						const unsigned int *d_headlist,
-						const float ndsr,
-						const float k_n,
-						const float kappa,
-						const float beta,
-						const float epsq,
+						const Scalar ndsr,
+						const Scalar k_n,
+						const Scalar kappa,
+						const Scalar beta,
+						const Scalar epsq,
 						const BoxDim box
 						){
 
@@ -95,15 +95,15 @@ __global__ void Stokes_SetForce_manually_kernel(
     Scalar4 posi = d_pos[idx];  // position
 
     // Interparticle force
-    float F_x = 0.;
-    float F_y = 0.;
-    float F_z = 0.;
+    Scalar F_x = 0.;
+    Scalar F_y = 0.;
+    Scalar F_z = 0.;
 
     // Interparticle force parameters
-    float h_rough = sqrt(epsq);       //roughness height
-    float rcol = 2.0 + 1.0*h_rough;   //collision cutoff
-    float F_0 = 1.0/ndsr;             //repulsive force scale (ASSUMING sr = 1.0)
-    float Hamaker = F_0*beta;         //Hamaker constant for vdW
+    Scalar h_rough = sqrt(epsq);       //roughness height
+    Scalar rcol = 2.0 + 1.0*h_rough;   //collision cutoff
+    Scalar F_0 = 1.0/ndsr;             //repulsive force scale (ASSUMING sr = 1.0)
+    Scalar Hamaker = F_0*beta;         //Hamaker constant for vdW
     
     // Neighborlist arrays
     unsigned int head_idx = d_headlist[ idx ]; // Location in head array for neighbors of current particle
@@ -122,7 +122,7 @@ __global__ void Stokes_SetForce_manually_kernel(
 
       Scalar  gap1 = dist - rcol;  //surface gap
 
-      float F_app_mag = 0.;  //applied force magnitude
+      Scalar F_app_mag = 0.;  //applied force magnitude
       
       // vdW and electrostatic repulsion
       if (gap1 >= 0. && gap1 <= 10.0/kappa)
@@ -133,9 +133,9 @@ __global__ void Stokes_SetForce_manually_kernel(
       	F_app_mag = Hamaker/(12.*epsq) - F_0 - k_n * abs(gap1);
       
       // Normal vector
-      float normalx = R.x/dist;  //from center to neighbor
-      float normaly = R.y/dist;  //from center to neighbor
-      float normalz = R.z/dist;  //from center to neighbor
+      Scalar normalx = R.x/dist;  //from center to neighbor
+      Scalar normaly = R.y/dist;  //from center to neighbor
+      Scalar normalz = R.z/dist;  //from center to neighbor
 
       // Accumulate the collision/repulsive forces
       F_x += F_app_mag * normalx;
@@ -166,7 +166,7 @@ __global__ void Stokes_SetForce_manually_kernel(
 */
 __global__ void Stokes_SetVelocity_kernel(
 						Scalar4 *d_vel,
-						float   *d_Velocity,
+						Scalar   *d_Velocity,
 						unsigned int group_size,
 						unsigned int *d_group_members
 						){

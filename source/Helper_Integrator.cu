@@ -46,7 +46,7 @@ namespace md
 {
 
 __global__ void Integrator_RFD_RandDisp_kernel(
-								float *d_psi,
+								Scalar *d_psi,
 								unsigned int N,
 								
 								// Edmond 03/31/2023 : rand number now passed in seed & timestep
@@ -68,17 +68,17 @@ __global__ void Integrator_RFD_RandDisp_kernel(
 		RandomGenerator rng(hoomd::Seed(50, timestep, seed),
 			hoomd::Counter(idx));
 		// Square root of 3
-		float sqrt3 = 1.732050807568877;
+		Scalar sqrt3 = 1.732050807568877;
 		
 		// Call the random number generator
 		// Edmond 03/31/2023:
 		hoomd::UniformDistribution<Scalar> uniform(Scalar(-sqrt3), Scalar(sqrt3));
-		float x1 = uniform(rng);
-		float y1 = uniform(rng);
-		float z1 = uniform(rng);
-		float x2 = uniform(rng);
-		float y2 = uniform(rng);
-		float z2 = uniform(rng);
+		Scalar x1 = uniform(rng);
+		Scalar y1 = uniform(rng);
+		Scalar z1 = uniform(rng);
+		Scalar x2 = uniform(rng);
+		Scalar y2 = uniform(rng);
+		Scalar z2 = uniform(rng);
 
 		// Write to output
 		d_psi[ 6*idx + 0 ] = x1;
@@ -100,7 +100,7 @@ __global__ void Integrator_RFD_RandDisp_kernel(
 
 */
 __global__ void Integrator_ZeroVelocity_kernel( 
-						float *d_b,
+						Scalar *d_b,
 						unsigned int N
 						){
 
@@ -129,8 +129,8 @@ __global__ void Integrator_ZeroVelocity_kernel(
 
 */
 __global__ void Integrator_AddStrainRate_kernel( 
-						float *d_b,
-						float shear_rate,
+						Scalar *d_b,
+						Scalar shear_rate,
 						unsigned int N
 						){
 

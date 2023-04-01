@@ -242,8 +242,8 @@ __global__ void Mobility_WaveSpace_ContractD(
 						);
 
 void Mobility_GeneralizedMobility(	
-					float *d_generalU,
-					float *d_generalF,
+					Scalar *d_generalU,
+					Scalar *d_generalF,
 					Scalar4 *d_pos,
 					unsigned int *d_group_members,
 					unsigned int group_size,

@@ -79,13 +79,13 @@ void Precondition_Brownian_Undo(
 void Precondition_Saddle_RFUmultiply(	
 					Scalar *d_y,       // output
 					Scalar *d_x,       // input
-					float *d_Scratch, // intermediate storage
+					Scalar *d_Scratch, // intermediate storage
 					const int *d_prcm,
 					int group_size,
 					unsigned int nnz,
 					const int   *d_L_RowPtr,
 					const int   *d_L_ColInd,
-					const float *d_L_Val,
+					const Scalar *d_L_Val,
 					cusparseHandle_t spHandle,
         				cusparseStatus_t spStatus,
 					cusparseMatDescr_t descr_L,

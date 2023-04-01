@@ -51,8 +51,8 @@ typedef cufftComplex hipfftComplex;
 using namespace hoomd;
 
 void Saddle_Multiply( 
-                        	float *d_b, // output
-				float *d_x, // input
+                        	Scalar *d_b, // output
+				Scalar *d_x, // input
 				Scalar4 *d_pos,
 				unsigned int *d_group_members,
 				unsigned int group_size,
@@ -64,8 +64,8 @@ void Saddle_Multiply(
 				);
 
 void Saddle_Preconditioner(	
-				float *d_x, // Solution
-				float *d_b, // RHS
+				Scalar *d_x, // Solution
+				Scalar *d_b, // RHS
 				int group_size,
 				void *pBuffer,
 				KernelData *ker_data,

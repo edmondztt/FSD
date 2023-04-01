@@ -62,9 +62,9 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <assert.h>
 #endif
 
-//! command to convert floats or doubles to integers
+//! command to convert Scalars or doubles to integers
 #ifdef SINGLE_PRECISION
-#define __scalar2int_rd __float2int_rd
+#define __scalar2int_rd __Scalar2int_rd
 #else
 #define __scalar2int_rd __double2int_rd
 #endif
@@ -100,8 +100,12 @@ __global__ void Mobility_ZeroGrid_kernel(
 	
 	// Check if index is within bounds
 	if ( tid < NxNyNz ) {
-	
-		grid[tid] = make_scalar2( 0.0, 0.0 );  
+		// Edmond 03/31/2023: try hip
+		CUFFTCOMPLEX tmp;
+		tmp.x = 0.0; 
+		tmp.y = 0.0;
+		grid[tid] = tmp;
+		// grid[tid] = make_scalar2( 0.0, 0.0 );  
 	
 	}
 }

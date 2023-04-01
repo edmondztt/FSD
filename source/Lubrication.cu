@@ -29,9 +29,9 @@
 #include <assert.h>
 #endif
 
-//! Command to convert floats or doubles to integers
+//! Command to convert Scalars or doubles to integers
 #ifdef SINGLE_PRECISION
-#define __scalar2int_rd __float2int_rd
+#define __scalar2int_rd __Scalar2int_rd
 #else
 #define __scalar2int_rd __double2int_rd
 #endif
@@ -82,11 +82,11 @@ __global__ void Lubrication_RFU_kernel(
 			      		const BoxDim box,
 					const unsigned int *d_n_neigh, 
 					unsigned int *d_nlist, 
-					const unsigned int *d_headlist, 
+					const long unsigned int *d_headlist, 
 					const Scalar *d_ResTable_dist,
 					const Scalar *d_ResTable_vals,
-					const float ResTable_min,
-					const float ResTable_dr,
+					const Scalar ResTable_min,
+					const Scalar ResTable_dr,
 					const Scalar rlub
 					){
   
@@ -117,7 +117,7 @@ __global__ void Lubrication_RFU_kernel(
     Scalar3 li = make_scalar3( 0.0, 0.0, 0.0 );	
     	
     // Neighborlist arrays
-    unsigned int head_idx = d_headlist[ curr_particle ]; // Location in head array for neighbors of current particle
+    long unsigned int head_idx = d_headlist[ curr_particle ]; // Location in head array for neighbors of current particle
     unsigned int n_neigh = d_n_neigh[ curr_particle ];   // Number of neighbors of the nearest particle
 	
     // Loop over all the neighbors for the current particle and add those
@@ -363,11 +363,11 @@ __global__ void Lubrication_RFE_kernel(
 			      		BoxDim box,
 					const unsigned int *d_n_neigh,
 					unsigned int *d_nlist,
-					const unsigned int *d_headlist,
+					const long unsigned int *d_headlist,
 					const Scalar *d_ResTable_dist,
 					const Scalar *d_ResTable_vals,
-					const float ResTable_min,
-					const float ResTable_dr,
+					const Scalar ResTable_min,
+					const Scalar ResTable_dr,
 					const Scalar rlub
 					){
 
@@ -383,7 +383,7 @@ __global__ void Lubrication_RFE_kernel(
     // Particle info for this thread
     unsigned int curr_particle = d_group_members[ tidx ];
 
-    unsigned int head_idx = d_headlist[ curr_particle ]; // Location in head array for neighbors of current particle
+    long unsigned int head_idx = d_headlist[ curr_particle ]; // Location in head array for neighbors of current particle
     unsigned int n_neigh = d_n_neigh[ curr_particle ]; // Number of neighbors of the nearest particle
 
     // Neighbor counters
@@ -642,11 +642,11 @@ __global__ void Lubrication_RSU_kernel(
 				       BoxDim box,
 				       const unsigned int *d_n_neigh,
 				       unsigned int *d_nlist,
-				       const unsigned int *d_headlist,
+				       const long unsigned int *d_headlist,
 				       const Scalar *d_ResTable_dist,
 				       const Scalar *d_ResTable_vals,
-				       const float ResTable_min,
-				       const float ResTable_dr,
+				       const Scalar ResTable_min,
+				       const Scalar ResTable_dr,
 				       const Scalar rlub
 				       ){
 
@@ -661,7 +661,7 @@ __global__ void Lubrication_RSU_kernel(
 
     // Particle info for this thread
     unsigned int curr_particle = d_group_members[ tidx ];
-    unsigned int head_idx = d_headlist[ curr_particle ]; // Location in head array for neighbors of current particle
+    long unsigned int head_idx = d_headlist[ curr_particle ]; // Location in head array for neighbors of current particle
     unsigned int n_neigh = d_n_neigh[ curr_particle ]; // Number of neighbors of the nearest particle
 
     // Neighbor counters
@@ -696,7 +696,7 @@ __global__ void Lubrication_RSU_kernel(
       // index as 1 and the one with the higher as 2.
       //
       // Applies to the distance vector between the particles
-      //float jo_sign = ( curr_particle < curr_neigh ) ? 1.0 : -1.0;
+      //Scalar jo_sign = ( curr_particle < curr_neigh ) ? 1.0 : -1.0;
 
       // Position of neighbor particle
       Scalar4 posj = d_pos[ curr_neigh ];
@@ -943,13 +943,13 @@ __global__ void Lubrication_RSE_kernel(
 				       unsigned int *d_group_members,
 				       const unsigned int *d_n_neigh,
 				       unsigned int *d_nlist,
-				       const unsigned int *d_headlist,
+				       const long unsigned int *d_headlist,
 				       Scalar4 *d_pos,
 				       BoxDim box,
 				       const Scalar *d_ResTable_dist,
 				       const Scalar *d_ResTable_vals,
-				       const float ResTable_min,
-				       const float ResTable_dr
+				       const Scalar ResTable_min,
+				       const Scalar ResTable_dr
 				       ){
 
   // Index for current thread
@@ -960,7 +960,7 @@ __global__ void Lubrication_RSE_kernel(
 
     // Particle info for this thread
     unsigned int curr_particle = d_group_members[ tidx ];
-    unsigned int head_idx = d_headlist[ curr_particle ]; // Location in head array for neighbors of current particle
+    long unsigned int head_idx = d_headlist[ curr_particle ]; // Location in head array for neighbors of current particle
     unsigned int n_neigh = d_n_neigh[ curr_particle ]; // Number of neighbors of the nearest particle
 
     // Neighbor counters
@@ -1203,8 +1203,8 @@ __global__ void Lubrication_RSE_kernel(
 
 */
 __global__ void Lubrication_RSEgeneral_kernel(
-					float *d_Stresslet,
-					float *d_Strain,
+					Scalar *d_Stresslet,
+					Scalar *d_Strain,
 					int group_size,
 					unsigned int *d_group_members,
 					const unsigned int *d_n_neigh,
@@ -1214,8 +1214,8 @@ __global__ void Lubrication_RSEgeneral_kernel(
 			      		BoxDim box,
 					const Scalar *d_ResTable_dist,
 					const Scalar *d_ResTable_vals,
-					const float ResTable_min,
-					const float ResTable_dr
+					const Scalar ResTable_min,
+					const Scalar ResTable_dr
 					){
 
 	// Index for current thread
@@ -1227,7 +1227,7 @@ __global__ void Lubrication_RSEgeneral_kernel(
 		// Particle info for this thread
 		unsigned int curr_particle = d_group_members[ tidx ];
 
-		unsigned int head_idx = d_headlist[ curr_particle ]; // Location in head array for neighbors of current particle
+		long unsigned int head_idx = d_headlist[ curr_particle ]; // Location in head array for neighbors of current particle
 		unsigned int n_neigh = d_n_neigh[ curr_particle ]; // Number of neighbors of the nearest particle
 
 		// Neighbor counters
@@ -1473,11 +1473,11 @@ __global__ void Lubrication_RFEgeneral_kernel(
 			      		BoxDim box,
 					const unsigned int *d_n_neigh,
 					unsigned int *d_nlist,
-					const unsigned int *d_headlist,
+					const long unsigned int *d_headlist,
 					const Scalar *d_ResTable_dist,
 					const Scalar *d_ResTable_vals,
-					const float ResTable_min,
-					const float ResTable_dr,
+					const Scalar ResTable_min,
+					const Scalar ResTable_dr,
 					const Scalar rlub
 					){
 	// Index for current thread
@@ -1492,7 +1492,7 @@ __global__ void Lubrication_RFEgeneral_kernel(
 		// Particle info for this thread
 		unsigned int curr_particle = d_group_members[ tidx ];
 
-		unsigned int head_idx = d_headlist[ curr_particle ]; // Location in head array for neighbors of current particle
+		long unsigned int head_idx = d_headlist[ curr_particle ]; // Location in head array for neighbors of current particle
 		unsigned int n_neigh = d_n_neigh[ curr_particle ]; // Number of neighbors of the nearest particle
 
 		// Neighbor counters
@@ -1524,8 +1524,8 @@ __global__ void Lubrication_RFEgeneral_kernel(
 		Eblocki[2][2] = (-1.0/3.0) * ( Ei[0] + Ei[4] );
 
 		// Initialize force/torque
-		float fi[3] = { 0.0 };
-		float li[3] = { 0.0 };
+		Scalar fi[3] = { 0.0 };
+		Scalar li[3] = { 0.0 };
 
 		// Loop over all the neighbors for the current particle and add those
 		// pair entries to the lubrication resistance tensor
@@ -1539,7 +1539,7 @@ __global__ void Lubrication_RFEgeneral_kernel(
 			// index as 1 and the one with the higher as 2.
 			//
 			// Applies to the distance vector between the particles
-			float jo_sign = ( curr_particle < curr_neigh ) ? 1.0 : -1.0;
+			Scalar jo_sign = ( curr_particle < curr_neigh ) ? 1.0 : -1.0;
 			jo_sign *= -1.0; // Accounts for using the RSU tensor to compute RFE
 			// Position of neighbor particle
 			Scalar4 posj = d_pos[ curr_neigh ];

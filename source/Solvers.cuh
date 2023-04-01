@@ -51,13 +51,13 @@ typedef cufftComplex hipfftComplex;
 using namespace hoomd;
 
 void Solvers_Saddle(
-			float *d_rhs, 
-			float *d_solution,
+			Scalar *d_rhs, 
+			Scalar *d_solution,
 			Scalar4 *d_pos,
 			unsigned int *d_group_members,
 			unsigned int group_size,
 			const BoxDim& box,
-			float tol,
+			Scalar tol,
 			void *pBuffer,
 			KernelData *ker_data,
 			MobilityData *mob_data,

@@ -44,8 +44,8 @@ void level_set_print ( int node_num, int level_num, int level_row[],
 bool perm_check ( int n, int p[] );
 void perm_inverse3 ( int n, int perm[], int perm_inv[] );
 int *perm_uniform ( int n, int *seed );
-float r4_abs ( float x );
-int r4_nint ( float x );
+double r4_abs ( double x );
+int r4_nint ( double x );
 void r82vec_permute ( int n, double a[], int p[] );
 void r8mat_print_some ( int m, int n, double a[], int ilo, int jlo, int ihi, 
   int jhi, std::string title );

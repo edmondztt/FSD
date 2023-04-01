@@ -79,9 +79,9 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <assert.h>
 #endif
 
-//! command to convert floats or doubles to integers
+//! command to convert Scalars or doubles to integers
 #ifdef SINGLE_PRECISION
-#define __scalar2int_rd __float2int_rd
+#define __scalar2int_rd __Scalar2int_rd
 #else
 #define __scalar2int_rd __double2int_rd
 #endif
@@ -163,11 +163,11 @@ __global__ void Mobility_WaveSpace_Spread_kernel(
 							Scalar expfac
 							){
 
-	__shared__ float4 shared[4]; // 16 kb max
+	__shared__ Scalar4 shared[4]; // 16 kb max
 	
-	float4 *force_shared = shared;
-	float4 *couplet_shared = &shared[1];	
-	float4 *pos_shared = &shared[3];
+	Scalar4 *force_shared = shared;
+	Scalar4 *couplet_shared = &shared[1];	
+	Scalar4 *pos_shared = &shared[3];
 
 	int group_idx = blockIdx.x;
 	int thread_offset = threadIdx.z + threadIdx.y * blockDim.z + threadIdx.x * blockDim.z*blockDim.y;
@@ -521,10 +521,10 @@ __global__ void Mobility_WaveSpace_ContractU(
 					 	Scalar expfac
 						){
 	
-	extern __shared__ float3 shared3[];
+	extern __shared__ Scalar3 shared3[];
 	
-	float3 *velocity = shared3;
-	float3 *pos_shared = &shared3[blockDim.x*blockDim.y*blockDim.z];
+	Scalar3 *velocity = shared3;
+	Scalar3 *pos_shared = &shared3[blockDim.x*blockDim.y*blockDim.z];
 	
 	int group_idx = blockIdx.x;
 	int thread_offset = threadIdx.z + threadIdx.y * blockDim.z + threadIdx.x * blockDim.z*blockDim.y;
@@ -558,9 +558,9 @@ __global__ void Mobility_WaveSpace_ContractU(
 	int x = int( pos_frac.x );
 	int y = int( pos_frac.y );
 	int z = int( pos_frac.z );
-	//x = ( pos_frac.x - float(x) < 0.5 ) ? x : x + 1;
-	//y = ( pos_frac.y - float(y) < 0.5 ) ? y : y + 1;
-	//z = ( pos_frac.z - float(z) < 0.5 ) ? z : z + 1;
+	//x = ( pos_frac.x - Scalar(x) < 0.5 ) ? x : x + 1;
+	//y = ( pos_frac.y - Scalar(y) < 0.5 ) ? y : y + 1;
+	//z = ( pos_frac.z - Scalar(z) < 0.5 ) ? z : z + 1;
 	
 	int3 n;
 	n.x = ( P + blockDim.x - 1 ) / blockDim.x; // ceiling
@@ -696,10 +696,10 @@ __global__ void Mobility_WaveSpace_ContractD(
 					 	Scalar expfac
 						){
 
-	extern __shared__ float4 shared4[];
+	extern __shared__ Scalar4 shared4[];
 	
-	float4 *velocity = shared4;
-	float4 *pos_shared = &shared4[2*blockDim.x*blockDim.y*blockDim.z];
+	Scalar4 *velocity = shared4;
+	Scalar4 *pos_shared = &shared4[2*blockDim.x*blockDim.y*blockDim.z];
 	
 	int group_idx = blockIdx.x;
 	int thread_offset = threadIdx.z + threadIdx.y * blockDim.z + threadIdx.x * blockDim.z*blockDim.y;
@@ -734,9 +734,9 @@ __global__ void Mobility_WaveSpace_ContractD(
 	int x = int( pos_frac.x );
 	int y = int( pos_frac.y );
 	int z = int( pos_frac.z );
-	//x = ( pos_frac.x - float(x) < 0.5 ) ? x : x + 1;
-	//y = ( pos_frac.y - float(y) < 0.5 ) ? y : y + 1;
-	//z = ( pos_frac.z - float(z) < 0.5 ) ? z : z + 1;
+	//x = ( pos_frac.x - Scalar(x) < 0.5 ) ? x : x + 1;
+	//y = ( pos_frac.y - Scalar(y) < 0.5 ) ? y : y + 1;
+	//z = ( pos_frac.z - Scalar(z) < 0.5 ) ? z : z + 1;
 	
 	int3 n;
 	n.x = ( P + blockDim.x - 1 ) / blockDim.x; // ceiling
@@ -982,8 +982,8 @@ void gpu_stokes_Mwave_wrap(
 	cufftExecC2C(plan, d_gridZY, d_gridZY, CUFFT_INVERSE);
 	
 	// Evaluate contribution of grid velocities at particle centers
-	Mobility_WaveSpace_ContractU<<<Cgrid, Cthreads, (B*B*B+1)*sizeof(float3)>>>( d_pos, d_vel, d_gridX, d_gridY, d_gridZ, group_size, Nx, Ny, Nz, xi, eta, d_group_members, box, P, gridh, quadW*prefac, expfac );
-	Mobility_WaveSpace_ContractD<<<Cgrid, Cthreads, (2*B*B*B+1)*sizeof(float4)>>>( d_pos, d_delu, d_gridXX, d_gridXY, d_gridXZ, d_gridYX, d_gridYY, d_gridYZ, d_gridZX, d_gridZY, group_size, Nx, Ny, Nz, xi, eta, d_group_members, box, P, gridh, quadW*prefac, expfac );
+	Mobility_WaveSpace_ContractU<<<Cgrid, Cthreads, (B*B*B+1)*sizeof(Scalar3)>>>( d_pos, d_vel, d_gridX, d_gridY, d_gridZ, group_size, Nx, Ny, Nz, xi, eta, d_group_members, box, P, gridh, quadW*prefac, expfac );
+	Mobility_WaveSpace_ContractD<<<Cgrid, Cthreads, (2*B*B*B+1)*sizeof(Scalar4)>>>( d_pos, d_delu, d_gridXX, d_gridXY, d_gridXZ, d_gridYX, d_gridYY, d_gridYZ, d_gridZX, d_gridZY, group_size, Nx, Ny, Nz, xi, eta, d_group_members, box, P, gridh, quadW*prefac, expfac );
  
 }
 
@@ -1413,8 +1413,8 @@ void Mobility_MobilityUD(
 	mob_data		(input)  structure containing informaiton for mobility calculations
 */
 void Mobility_GeneralizedMobility(	
-					float *d_generalU, // output
-					float *d_generalF, // input
+					Scalar *d_generalU, // output
+					Scalar *d_generalF, // input
 					Scalar4 *d_pos,
 					unsigned int *d_group_members,
 					unsigned int group_size,

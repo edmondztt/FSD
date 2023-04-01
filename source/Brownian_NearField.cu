@@ -57,8 +57,8 @@ __global__ void Brownian_NearField_RNG_kernel(
 						// const unsigned int seed
 						uint64_t timestep,
 						uint16_t seed,
-						const float T,
-						const float dt
+						const Scalar T,
+						const Scalar dt
 						){
 
 	// Thread index
@@ -82,7 +82,7 @@ __global__ void Brownian_NearField_RNG_kernel(
 		//
 		// Therefore the right scale is 3 * ( 2 * T / dt );
 		// Edmond 03/31/2023:
-		float fac = sqrtf( 3.0 * ( 2.0 * T / dt ) );
+		Scalar fac = sqrtf( 3.0 * ( 2.0 * T / dt ) );
 		hoomd::UniformDistribution<Scalar> uniform(Scalar(-fac), Scalar(fac));
 		// Generate random numbers and assign to global output
 		d_Psi_nf[ 6 * idx     ] = uniform(rng);

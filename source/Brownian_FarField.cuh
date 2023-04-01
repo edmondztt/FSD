@@ -45,7 +45,7 @@ typedef cufftComplex hipfftComplex;
 using namespace hoomd;
 
 void Brownian_FarField_SlipVelocity(
-			        	float *d_Uslip_ff,
+			        	Scalar *d_Uslip_ff,
 					Scalar4 *d_pos,
                                 	unsigned int *d_group_members,
                                 	unsigned int group_size,

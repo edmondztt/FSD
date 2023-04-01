@@ -16,9 +16,9 @@
 #include <assert.h>
 #endif
 
-//! command to convert floats or doubles to integers
+//! command to convert Scalars or doubles to integers
 #ifdef SINGLE_PRECISION
-#define __scalar2int_rd __float2int_rd
+#define __scalar2int_rd __Scalar2int_rd
 #else
 #define __scalar2int_rd __double2int_rd
 #endif
@@ -295,7 +295,12 @@ __global__ void Brownian_FarField_AddGrids_kernel(
 		unsigned int idx = tidx;
 		CUFFTCOMPLEX A = d_a[idx];
 		CUFFTCOMPLEX B = d_b[idx];
-		d_c[idx] = make_scalar2(A.x+B.x, A.y+B.y);
+		// Edmond 03/31/2023
+		CUFFTCOMPLEX C = A;
+		C.x += B.x;
+		C.y += B.y;
+		d_c[idx] = C;
+		// d_c[idx] = make_scalar2(A.x+B.x, A.y+B.y);
 	}
 }
 
@@ -408,7 +413,7 @@ void Brownian_Sqrt(
 	    W1[ii] = sqrtf( alpha[ii] ) * W[ii];
 	}
 	// Tm = W * W1 = W * Lambda^(1/2) * W^T * e1
-	float tempsum;
+	Scalar tempsum;
 	for ( int ii = 0; ii < m; ++ii ){
 		tempsum = 0.0;
 		for ( int jj = 0; jj < m; ++jj ){

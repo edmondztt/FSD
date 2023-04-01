@@ -15,9 +15,9 @@
 #include <assert.h>
 #endif
 
-//! command to convert floats or doubles to integers
+//! command to convert Scalars or doubles to integers
 #ifdef SINGLE_PRECISION
-#define __scalar2int_rd __float2int_rd
+#define __scalar2int_rd __Scalar2int_rd
 #else
 #define __scalar2int_rd __double2int_rd
 #endif
@@ -40,7 +40,7 @@ namespace md
 {
 
 __global__ void Saddle_ZeroOutput_kernel( 
-						float *d_b,
+						Scalar *d_b,
 						unsigned int N
 						){
 
@@ -60,7 +60,7 @@ __global__ void Saddle_ZeroOutput_kernel(
 
 
 /*!
-        Direct addition of two float arrays
+        Direct addition of two Scalar arrays
 
         C = a*A + b*B
         C can be A or B, so that A or B will be overwritten
@@ -73,11 +73,11 @@ __global__ void Saddle_ZeroOutput_kernel(
         N		(input)  length of vectors
 	stride		(input)  number of repeats
 */
-__global__ void Saddle_AddFloat_kernel( 	float *d_a, 
-						float *d_b,
-						float *d_c,
-						float coeff_a,
-						float coeff_b,
+__global__ void Saddle_AddFloat_kernel( 	Scalar *d_a, 
+						Scalar *d_b,
+						Scalar *d_c,
+						Scalar coeff_a,
+						Scalar coeff_b,
 						unsigned int N,
 						int stride
 						){
@@ -110,7 +110,7 @@ __global__ void Saddle_AddFloat_kernel( 	float *d_a,
 	N		(input)  number of particles
 
 */
-__global__ void Saddle_SplitGeneralizedF_kernel( 	float *d_generalF, 
+__global__ void Saddle_SplitGeneralizedF_kernel( 	Scalar *d_generalF, 
 							Scalar4 *d_net_force,
 							Scalar4 *d_TorqueStress,
 							unsigned int N
@@ -125,17 +125,17 @@ __global__ void Saddle_SplitGeneralizedF_kernel( 	float *d_generalF,
 		int ind2 = 6*N + 5*idx;      
  
 		// 
-		float f1 = d_generalF[ ind1 + 0 ];
-		float f2 = d_generalF[ ind1 + 1 ];
-		float f3 = d_generalF[ ind1 + 2 ];
-		float l1 = d_generalF[ ind1 + 3 ];
-		float l2 = d_generalF[ ind1 + 4 ];
-		float l3 = d_generalF[ ind1 + 5 ];
-		float s1 = d_generalF[ ind2 + 0 ];
-		float s2 = d_generalF[ ind2 + 1 ];
-		float s3 = d_generalF[ ind2 + 2 ];
-		float s4 = d_generalF[ ind2 + 3 ];
-		float s5 = d_generalF[ ind2 + 4 ];
+		Scalar f1 = d_generalF[ ind1 + 0 ];
+		Scalar f2 = d_generalF[ ind1 + 1 ];
+		Scalar f3 = d_generalF[ ind1 + 2 ];
+		Scalar l1 = d_generalF[ ind1 + 3 ];
+		Scalar l2 = d_generalF[ ind1 + 4 ];
+		Scalar l3 = d_generalF[ ind1 + 5 ];
+		Scalar s1 = d_generalF[ ind2 + 0 ];
+		Scalar s2 = d_generalF[ ind2 + 1 ];
+		Scalar s3 = d_generalF[ ind2 + 2 ];
+		Scalar s4 = d_generalF[ ind2 + 3 ];
+		Scalar s5 = d_generalF[ ind2 + 4 ];
 
 		d_net_force[ idx ] = make_scalar4( f1, f2, f3, 0.0 );
 		d_TorqueStress[ 2*idx + 0 ] = make_scalar4( l1, l2, l3, s1 );
@@ -153,7 +153,7 @@ __global__ void Saddle_SplitGeneralizedF_kernel( 	float *d_generalF,
 	N		(input)  number of particles
 
 */
-__global__ void Saddle_MakeGeneralizedU_kernel( 	float *d_generalU, 
+__global__ void Saddle_MakeGeneralizedU_kernel( 	Scalar *d_generalU, 
 							Scalar4 *d_vel,
 							Scalar4 *d_AngvelStrain,
 							unsigned int N
@@ -164,9 +164,9 @@ __global__ void Saddle_MakeGeneralizedU_kernel( 	float *d_generalU,
 	// Check if thread is in bounds
 	if (idx < N) {
 
-		float4 vel = d_vel[ idx ];
-		float4 AS1 = d_AngvelStrain[ 2*idx + 0 ];
-		float4 AS2 = d_AngvelStrain[ 2*idx + 1 ];
+		Scalar4 vel = d_vel[ idx ];
+		Scalar4 AS1 = d_AngvelStrain[ 2*idx + 0 ];
+		Scalar4 AS2 = d_AngvelStrain[ 2*idx + 1 ];
 
 		int ind1 = 6*idx;
 		int ind2 = 6*N + 5*idx;      
@@ -208,8 +208,8 @@ __global__ void Saddle_MakeGeneralizedU_kernel( 	float *d_generalU,
 
 */
 __global__ void Saddle_force2rhs_kernel(
-					float *d_force, 
-					float *d_rhs,
+					Scalar *d_force, 
+					Scalar *d_rhs,
 					unsigned int N
 ){
 	// Thread index
@@ -246,8 +246,8 @@ __global__ void Saddle_force2rhs_kernel(
 
 */
 __global__ void Saddle_solution2vel_kernel(
-					float *d_U, 
-					float *d_solution,
+					Scalar *d_U, 
+					Scalar *d_solution,
 					unsigned int N
 ){
 	// Thread index

@@ -41,9 +41,9 @@
 #include <assert.h>
 #endif
 
-//! command to convert floats or doubles to integers
+//! command to convert Scalars or doubles to integers
 #ifdef SINGLE_PRECISION
-#define __scalar2int_rd __float2int_rd
+#define __scalar2int_rd __Scalar2int_rd
 #else
 #define __scalar2int_rd __double2int_rd
 #endif
@@ -85,8 +85,8 @@ namespace md
 
 
 void Saddle_Multiply( 
-                        	float *d_b, // output
-				float *d_x, // input
+                        	Scalar *d_b, // output
+				Scalar *d_x, // input
 				Scalar4 *d_pos,
 				unsigned int *d_group_members,
 				unsigned int group_size,
@@ -117,7 +117,7 @@ void Saddle_Multiply(
 				     work_data);
 	//// zhoge: Copy the first 11N entries from d_x to d_b to effectively turn off far-field mobility
 	//// (need to comment the Mobility_GeneralizedMobility above)
-	//cudaMemcpy( d_b, d_x, 11*group_size*sizeof(float), cudaMemcpyDeviceToDevice );
+	//cudaMemcpy( d_b, d_x, 11*group_size*sizeof(Scalar), cudaMemcpyDeviceToDevice );
 
 	
 	// M^ff*F + B*U => RHS[0:11N]. Effectively, d_b[0:6N] += d_x[11N:17N]
@@ -176,8 +176,8 @@ void Saddle_Multiply(
 
 */
 void Saddle_Preconditioner(	
-				float *d_x, 		// output
-				float *d_b, 		// input
+				Scalar *d_x, 		// output
+				Scalar *d_b, 		// input
 				int group_size,
 				void *pBuffer,
 				KernelData *ker_data,
@@ -189,11 +189,11 @@ void Saddle_Preconditioner(
 	dim3 threads = ker_data->particle_threads;
 
 	// Get pointer to scratch array (size 17N)
-	float *d_Scratch = res_data->Scratch2;	
+	Scalar *d_Scratch = res_data->Scratch2;	
 
 	// In the preconditioner, M is approximated as identity
 	// Effectively, d_Scratch[0:11N] = M^(-1) * d_b[0:11N]
-	cudaMemcpy( d_Scratch, d_b, 11*group_size*sizeof(float), cudaMemcpyDeviceToDevice );
+	cudaMemcpy( d_Scratch, d_b, 11*group_size*sizeof(Scalar), cudaMemcpyDeviceToDevice );
 	
 	//
 	// Incomplete Cholesky solves (done in place!) 
@@ -260,10 +260,10 @@ void Saddle_Preconditioner(
 	Saddle_AddFloat_kernel<<<grid,threads>>>( &d_Scratch[11*group_size], d_b, &d_Scratch[11*group_size], 1.0, -1.0, group_size, 6);
 
 	// Finish, d_x <-- d_Scratch
-	cudaMemcpy( d_x, d_Scratch, 17*group_size*sizeof(float), cudaMemcpyDeviceToDevice );
+	cudaMemcpy( d_x, d_Scratch, 17*group_size*sizeof(Scalar), cudaMemcpyDeviceToDevice );
 
 	//// zhoge: uncomment below to effectively turn off the preconditioner (can comment everything above, too)
-	//cudaMemcpy( d_x, d_b, 17*group_size*sizeof(float), cudaMemcpyDeviceToDevice );
+	//cudaMemcpy( d_x, d_b, 17*group_size*sizeof(Scalar), cudaMemcpyDeviceToDevice );
 	
 	// Clean up
 	d_Scratch = NULL;

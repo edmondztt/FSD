@@ -53,8 +53,8 @@ __global__ void Brownian_NearField_RNG_kernel(
 						Scalar *d_Psi_nf,
 						unsigned int N,
 						const unsigned int seed,
-						const float T,
-						const float dt
+						const Scalar T,
+						const Scalar dt
 						);
 
 

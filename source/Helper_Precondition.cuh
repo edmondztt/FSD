@@ -46,14 +46,14 @@ typedef cufftComplex hipfftComplex;
 using namespace hoomd;
 
 __global__ void Precondition_ZeroVector_kernel( 
-						float *d_b,
+						Scalar *d_b,
 						const unsigned int nnz,
 						const unsigned int group_size
 						);
 
 __global__ void Precondition_ApplyRCM_Vector_kernel( 
-							float *d_Scratch_Vector,
-							float *d_Vector,
+							Scalar *d_Scratch_Vector,
+							Scalar *d_Vector,
 							const int *d_prcm,
 							const int length,
 							const int direction
@@ -69,11 +69,11 @@ __global__ void Precondition_AddInt_kernel(
 						);
 
 __global__ void Precondition_AddIdentity_kernel(
-						float *d_L_Val,
+						Scalar *d_L_Val,
 						int   *d_L_RowPtr,
 						int   *d_L_ColInd, 
 						int group_size,
-						float ichol_relaxer
+						Scalar ichol_relaxer
 						);
 
 __global__ void Precondition_Inn_kernel(
@@ -102,41 +102,41 @@ __global__ void Precondition_InitializeMap_kernel(
 						);
 
 __global__ void Precondition_Map_kernel(
-						float *d_Scratch,
-						float *d_Val,
+						Scalar *d_Scratch,
+						Scalar *d_Val,
 						int *d_map,
 						int nnz
 						);
 
 __global__ void Precondition_GetDiags_kernel(
 						int group_size, 
-						float *d_Diag,
+						Scalar *d_Diag,
 						int   *d_L_RowPtr,
 						int   *d_L_ColInd,
-						float *d_L_Val
+						Scalar *d_L_Val
 						);
 
 __global__ void Precondition_DiagMult_kernel(
-						float *d_y, // output
-						float *d_x, // input
+						Scalar *d_y, // output
+						Scalar *d_x, // input
 						int group_size, 
-						float *d_Diag,
+						Scalar *d_Diag,
 						int direction
 						);
 
 __global__ void Precondition_ZeroUpperTriangle_kernel( 
 							int *d_RowPtr,
 							int *d_ColInd,
-							float *d_Val,
+							Scalar *d_Val,
 							int group_size
 							);
 
 __global__ void Precondition_Lmult_kernel( 
-						float *d_y,
-						float *d_x,
+						Scalar *d_y,
+						Scalar *d_x,
 						int *d_RowPtr,
 						int *d_ColInd,
-						float *d_Val,
+						Scalar *d_Val,
 						int group_size
 						);
 

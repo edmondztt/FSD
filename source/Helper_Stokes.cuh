@@ -45,31 +45,31 @@ using namespace hoomd;
 
 __global__ void Stokes_SetForce_kernel(
 					Scalar4 *d_net_force,
-					float   *d_AppliedForce,
+					Scalar   *d_AppliedForce,
 					unsigned int group_size,
 					unsigned int *d_group_members
 					);
 
 __global__ void Stokes_SetForce_manually_kernel(
 						const Scalar4 *d_pos,
-						float   *d_AppliedForce,
+						Scalar   *d_AppliedForce,
 						unsigned int group_size,
 						unsigned int *d_group_members,
 						const unsigned int *d_nneigh, 
 						unsigned int *d_nlist, 
 						const unsigned int *d_headlist,
-						const float ndsr,
-						const float k_n,
-						const float kappa,
-						const float beta,
-						const float epsq,
+						const Scalar ndsr,
+						const Scalar k_n,
+						const Scalar kappa,
+						const Scalar beta,
+						const Scalar epsq,
 						const BoxDim box
 						);
 
 
 __global__ void Stokes_SetVelocity_kernel(
 						Scalar4 *d_vel,
-						float   *d_Velocity,
+						Scalar   *d_Velocity,
 						unsigned int group_size,
 						unsigned int *d_group_members
 						);

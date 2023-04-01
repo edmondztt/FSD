@@ -118,7 +118,7 @@ public:
   void FreeWorkSpaces();
 
   //! Set the friction type
-  void setFriction( std::string friction_type, float h0, std::vector<float> &alpha );
+  void setFriction( std::string friction_type, Scalar h0, std::vector<Scalar> &alpha );
 
   //! Set the shear rate and shear frequency
   void setShear(std::shared_ptr<ShearFunction> shear_func, Scalar max_strain){
@@ -187,7 +187,7 @@ protected:
   int m_m_Lanczos_ff; //!< Number of Lanczos Iterations to use for calculation of far-field Brownian slip
   int m_m_Lanczos_nf; //!< Number of Lanczos Iterations to use for calculation of near-field Brownian force
 
-  float m_rfd_epsilon;	//!< epsilon for RFD displacement
+  Scalar m_rfd_epsilon;	//!< epsilon for RFD displacement
 
   Scalar m_error;  //!< Error tolerance for all calculations
 
@@ -201,15 +201,15 @@ protected:
   // Declare all variables for physical quantities (forces, velocities)
   // ******************************************************************
 
-  GPUArray<float> m_AppliedForce; // Force and torque applied to the particles
-  GPUArray<float> m_Velocity; // Linear velocity,  angular velocity, and stresslet of all particles
+  GPUArray<Scalar> m_AppliedForce; // Force and torque applied to the particles
+  GPUArray<Scalar> m_Velocity; // Linear velocity,  angular velocity, and stresslet of all particles
 
   // *********************************************************************************
   // Declare all variables related to the lubrication and required sparse calculations
   // *********************************************************************************
 
-  float m_ResTable_min; 		  //!< Minimum distance in the lubrication tabulation 
-  float m_ResTable_dr; 		  //!< Discretization of the lubrication table (in log space) 
+  Scalar m_ResTable_min; 		  //!< Minimum distance in the lubrication tabulation 
+  Scalar m_ResTable_dr; 		  //!< Discretization of the lubrication table (in log space) 
   GPUArray<Scalar> m_ResTable_dist; //!< Distance values used in the lubrication function tabulation
   GPUArray<Scalar> m_ResTable_vals; //!< Lubrication function tabulation
 			
@@ -226,12 +226,12 @@ protected:
   GPUArray<int>   m_L_RowInd;	//!< Rnf sparse storage ( COO Format - Row Indices )
   GPUArray<int>   m_L_RowPtr;	//!< Rnf sparse storage ( CSR Format - Row Pointer )
   GPUArray<int>   m_L_ColInd;	//!< Rnf sparse storage ( COO/CSR Format - Col Indices )
-  GPUArray<float> m_L_Val;	//!< L sparse storage ( COO/CSR Format - Values )
+  GPUArray<Scalar> m_L_Val;	//!< L sparse storage ( COO/CSR Format - Values )
 	
-  GPUArray<float> m_Diag;		//!< Diagonal entries for preconditioner
+  GPUArray<Scalar> m_Diag;		//!< Diagonal entries for preconditioner
   GPUArray<int>   m_HasNeigh;	//!< Whether a particle has neighbors or not	
 
-  float m_ichol_relaxer;	//!< magnitude of term to add to diagonal before IChol to ensure convergence
+  Scalar m_ichol_relaxer;	//!< magnitude of term to add to diagonal before IChol to ensure convergence
 
   cusolverSpHandle_t soHandle; //!< opaque handle fo cuSOLVER operations
  
@@ -249,9 +249,9 @@ protected:
   cusparseSolvePolicy_t policy_Lt; //!< Solve level output for L^T
   int m_pBufferSize;               //!< Buffer size for cuSPARSE calculations
 
-  GPUArray<float> m_Scratch1;     //!< 6*N, Scratch storage for re-ordered matrix-vector multiplication 
-  GPUArray<float> m_Scratch2;     //!< 17*N, Scratch storage for saddle point preconditioning
-  GPUArray<float> m_Scratch3;	//!< nnz, Scratch Storage for Value reordering 
+  GPUArray<Scalar> m_Scratch1;     //!< 6*N, Scratch storage for re-ordered matrix-vector multiplication 
+  GPUArray<Scalar> m_Scratch2;     //!< 17*N, Scratch storage for saddle point preconditioning
+  GPUArray<Scalar> m_Scratch3;	//!< nnz, Scratch Storage for Value reordering 
   GPUArray<int> m_prcm;           //!< matrix re-ordering vector using Reverse-Cuthill-Mckee (RCM)
 		
   std::string m_fileprefix;	//!< output file prefix

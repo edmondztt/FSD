@@ -27,9 +27,9 @@
 #include <assert.h>
 #endif
 
-//! command to convert floats or doubles to integers
+//! command to convert Scalars or doubles to integers
 #ifdef SINGLE_PRECISION
-#define __scalar2int_rd __float2int_rd
+#define __scalar2int_rd __Scalar2int_rd
 #else
 #define __scalar2int_rd __double2int_rd
 #endif
@@ -165,14 +165,14 @@ void Debug_PrintVector_Int( int *d_vec, int N, const char *name ){
 /*!
 	Print arrays for checks
 */
-void Debug_PrintVector_Float( float *d_vec, int N, const char *name ){
+void Debug_PrintVector_Float( Scalar *d_vec, int N, const char *name ){
 
 	// Set up host vector
-	float *h_vec;
-	h_vec = (float *)malloc( N*sizeof(float) );
+	Scalar *h_vec;
+	h_vec = (Scalar *)malloc( N*sizeof(Scalar) );
 
 	// Copy data to host and print
-	cudaMemcpy( h_vec, d_vec, N*sizeof(float), cudaMemcpyDeviceToHost );
+	cudaMemcpy( h_vec, d_vec, N*sizeof(Scalar), cudaMemcpyDeviceToHost );
 	printf( "\n" );
 	for ( int ii = 0; ii < N; ++ii ){
 		printf( "%s(%i) = %f; \n", name, ii+1, h_vec[ii] );
@@ -181,7 +181,7 @@ void Debug_PrintVector_Float( float *d_vec, int N, const char *name ){
 	
 	// Add another cudaMemcpy to make sure print statement gets out
 	// before any errors
-	cudaMemcpy( h_vec, d_vec, N*sizeof(float), cudaMemcpyDeviceToHost );
+	cudaMemcpy( h_vec, d_vec, N*sizeof(Scalar), cudaMemcpyDeviceToHost );
 
 	// Clean up
 	free( h_vec );
@@ -190,17 +190,17 @@ void Debug_PrintVector_Float( float *d_vec, int N, const char *name ){
 /*!
 	Print CSR matrix
 */
-void Debug_PrintVector_CSR( float *d_Val, int *d_RowPtr, int *d_ColInd, int nrows, int nnz, const char *name ){
+void Debug_PrintVector_CSR( Scalar *d_Val, int *d_RowPtr, int *d_ColInd, int nrows, int nnz, const char *name ){
 
 	// Set up host vectors
 	int *h_RowPtr, *h_ColInd;
-	float *h_Val;
-	h_Val = (float *)malloc( nnz*sizeof(float) );
+	Scalar *h_Val;
+	h_Val = (Scalar *)malloc( nnz*sizeof(Scalar) );
 	h_RowPtr = (int *)malloc( (nrows+1)*sizeof(int) );
 	h_ColInd = (int *)malloc( nnz*sizeof(int) );
 
 	// Copy data to host
-	cudaMemcpy( h_Val, d_Val, nnz*sizeof(float), cudaMemcpyDeviceToHost );
+	cudaMemcpy( h_Val, d_Val, nnz*sizeof(Scalar), cudaMemcpyDeviceToHost );
 	cudaMemcpy( h_RowPtr, d_RowPtr, (nrows+1)*sizeof(int), cudaMemcpyDeviceToHost );
 	cudaMemcpy( h_ColInd, d_ColInd, nnz*sizeof(int), cudaMemcpyDeviceToHost );
 	
@@ -213,7 +213,7 @@ void Debug_PrintVector_CSR( float *d_Val, int *d_RowPtr, int *d_ColInd, int nrow
 		for ( int jj = 0; jj < ncols; ++jj ){
 
 			int col = h_ColInd[ offset + jj ];
-			float val = h_Val[ offset + jj ];
+			Scalar val = h_Val[ offset + jj ];
 
 			// Print out in base-1
 			printf( "%s(%5i,%5i) = %8.5f; \n", name, ii+1, col+1, val );
@@ -223,7 +223,7 @@ void Debug_PrintVector_CSR( float *d_Val, int *d_RowPtr, int *d_ColInd, int nrow
 	
 	// Add another cudaMemcpy to make sure print statement gets out
 	// before any errors
-	cudaMemcpy( h_Val, d_Val, nnz*sizeof(float), cudaMemcpyDeviceToHost );
+	cudaMemcpy( h_Val, d_Val, nnz*sizeof(Scalar), cudaMemcpyDeviceToHost );
 
 	// Clean up
 	free( h_Val );
@@ -234,19 +234,19 @@ void Debug_PrintVector_CSR( float *d_Val, int *d_RowPtr, int *d_ColInd, int nrow
 /*!
 	Print Sparse matrix with indices for matlab
 */
-void Debug_PrintVector_CSR_forMatlab( int *d_RowPtr, int *d_ColInd, float* d_Val, int nrows, int nnz ){
+void Debug_PrintVector_CSR_forMatlab( int *d_RowPtr, int *d_ColInd, Scalar* d_Val, int nrows, int nnz ){
 
 	// Set up host vectors
 	int *h_RowPtr, *h_ColInd;
-	float *h_Val;
+	Scalar *h_Val;
 	h_RowPtr = (int *)malloc( (nrows+1)*sizeof(int) );
 	h_ColInd = (int *)malloc( nnz*sizeof(int) );
-	h_Val = (float *)malloc( nnz*sizeof(float) );
+	h_Val = (Scalar *)malloc( nnz*sizeof(Scalar) );
 
 	// Copy data to host
 	cudaMemcpy( h_RowPtr, d_RowPtr, (nrows+1)*sizeof(int), cudaMemcpyDeviceToHost );
 	cudaMemcpy( h_ColInd, d_ColInd, nnz*sizeof(int), cudaMemcpyDeviceToHost );
-	cudaMemcpy( h_Val, d_Val, nnz*sizeof(float), cudaMemcpyDeviceToHost );
+	cudaMemcpy( h_Val, d_Val, nnz*sizeof(Scalar), cudaMemcpyDeviceToHost );
 	
 	printf( "\n" );
 	for ( int ii = 0; ii < nrows; ++ii ){
@@ -258,7 +258,7 @@ void Debug_PrintVector_CSR_forMatlab( int *d_RowPtr, int *d_ColInd, float* d_Val
 
 			int col = h_ColInd[ offset + jj ];
 
-			float val = h_Val[ offset + jj ];
+			Scalar val = h_Val[ offset + jj ];
 
 			// Print out in base-1
 			printf( "%i %i %f \n", ii+1, col+1, val );
@@ -330,7 +330,7 @@ void Debug_PrintPos( Scalar4 *d_pos, int N ){
 	y = L * x;
 
 */
-__global__ void Debug_L_mult_kernel( float *d_y, float *d_x, int *d_RowPtr, int *d_ColInd, float *d_Val, int group_size, int nnz ){
+__global__ void Debug_L_mult_kernel( Scalar *d_y, Scalar *d_x, int *d_RowPtr, int *d_ColInd, Scalar *d_Val, int group_size, int nnz ){
 
 
 	// Index for current thread 
@@ -353,7 +353,7 @@ __global__ void Debug_L_mult_kernel( float *d_y, float *d_x, int *d_RowPtr, int 
 			// Loop over columns
 			int jj = start;
 			int col = d_ColInd[ jj ];
-			float val = d_Val[ jj ];
+			Scalar val = d_Val[ jj ];
 			while ( ( jj < end  ) ){ // && ( row <= col  ) ){
 
 				// Add to output
@@ -375,21 +375,21 @@ __global__ void Debug_L_mult_kernel( float *d_y, float *d_x, int *d_RowPtr, int 
 /*!
 	Check if array has any NaNs
 */
-void Debug_HasNaN( float *d_vec, int N ){
+void Debug_HasNaN( Scalar *d_vec, int N ){
 
 	// Set up host vector
-	float *h_vec;
-	h_vec = (float *)malloc( N*sizeof(float) );
+	Scalar *h_vec;
+	h_vec = (Scalar *)malloc( N*sizeof(Scalar) );
 
 	// Memory copy
-	cudaMemcpy( h_vec, d_vec, N*sizeof(float), cudaMemcpyDeviceToHost );
+	cudaMemcpy( h_vec, d_vec, N*sizeof(Scalar), cudaMemcpyDeviceToHost );
 
 	// Check for NaN. Comparisons involving NaNs are always false, so use
 	// that to check
 	int have_nan = 0;
 	for ( int ii = 0; ii < N; ++ii ){
 
-		float currval = h_vec[ ii ];
+		Scalar currval = h_vec[ ii ];
 
 		if ( isnan( currval ) ){
 
@@ -410,23 +410,23 @@ void Debug_HasNaN( float *d_vec, int N ){
 /*!
 	Check if matrix has zeros along diagonal
 */
-void Debug_HasZeroDiag( float *d_Diag, int N ){
+void Debug_HasZeroDiag( Scalar *d_Diag, int N ){
 
 	//
 	int numel = 6*N;
 
 	// Set up host vectors
-	float *h_Diag;
-	h_Diag = (float *)malloc( numel*sizeof(float) );
+	Scalar *h_Diag;
+	h_Diag = (Scalar *)malloc( numel*sizeof(Scalar) );
 
 	// Memory copy
-	cudaMemcpy( h_Diag, d_Diag, numel*sizeof(float), cudaMemcpyDeviceToHost );
+	cudaMemcpy( h_Diag, d_Diag, numel*sizeof(Scalar), cudaMemcpyDeviceToHost );
 
 	// Check for zeros
 	int have_zeros = 0;
 	for ( int ii = 0; ii < numel; ++ii ){
 		
-		float currval = h_Diag[ ii ];
+		Scalar currval = h_Diag[ ii ];
 
 		if ( currval == 0 ){
 
@@ -448,20 +448,20 @@ void Debug_HasZeroDiag( float *d_Diag, int N ){
 	Check whether CSR matrix has zero diagonal
 	(defined in Eq.(2.11) in Fiore & Swan (JFM 2019) /zhoge)
 */
-void Debug_CSRzeroDiag( int *d_RowPtr, int *d_ColInd, float *d_Val, int group_size, int nnz ){
+void Debug_CSRzeroDiag( int *d_RowPtr, int *d_ColInd, Scalar *d_Val, int group_size, int nnz ){
 
 	int *h_RowPtr, *h_ColInd;
-	float *h_Val;
+	Scalar *h_Val;
 
 	//h_RowPtr = (int *) malloc( 6*group_size*sizeof(int) ); 
 	h_RowPtr = (int *) malloc( (6*group_size+1)*sizeof(int) );  // should have +1 entries /zhoge
 	h_ColInd = (int *) malloc( nnz*sizeof(int) );
-	h_Val  = (float *) malloc( nnz*sizeof(float) );
+	h_Val  = (Scalar *) malloc( nnz*sizeof(Scalar) );
 
 	//cudaMemcpy( h_RowPtr, d_RowPtr, 6*group_size*sizeof(int), cudaMemcpyDeviceToHost );
 	cudaMemcpy( h_RowPtr, d_RowPtr, (6*group_size+1)*sizeof(int), cudaMemcpyDeviceToHost );  // same as above /zhoge
 	cudaMemcpy( h_ColInd, d_ColInd, nnz*sizeof(int), cudaMemcpyDeviceToHost );
-	cudaMemcpy( h_Val,    d_Val   , nnz*sizeof(float), cudaMemcpyDeviceToHost );
+	cudaMemcpy( h_Val,    d_Val   , nnz*sizeof(Scalar), cudaMemcpyDeviceToHost );
 
 	//printf( "  Number of non-zeros in the CSR matrix = %7i\n", nnz );  //just to check /zhoge
 	
@@ -485,7 +485,7 @@ void Debug_CSRzeroDiag( int *d_RowPtr, int *d_ColInd, float *d_Val, int group_si
 			// Loop over columns
 			int jj = start;
 			int col = h_ColInd[ jj ];
-			float val = h_Val[ jj ];
+			Scalar val = h_Val[ jj ];
 			
 			for( jj = start; jj < end; ++jj ){
 
@@ -531,13 +531,13 @@ void Debug_Lattice_SpinViscosity(
 	int numel = 6 * group_size;
 
 	// Initialize input and output vector 
-	float *h_x, *d_x;
-	h_x = (float *)malloc( 17*group_size*sizeof(float) );
-	cudaMalloc( (void**)&d_x, 17*group_size*sizeof(float) );
+	Scalar *h_x, *d_x;
+	h_x = (Scalar *)malloc( 17*group_size*sizeof(Scalar) );
+	cudaMalloc( (void**)&d_x, 17*group_size*sizeof(Scalar) );
 	
-	float *h_y, *d_y;
-	h_y = (float *)malloc( numel*sizeof(float) );
-	cudaMalloc( (void**)&d_y, 17*group_size*sizeof(float) );
+	Scalar *h_y, *d_y;
+	h_y = (Scalar *)malloc( numel*sizeof(Scalar) );
+	cudaMalloc( (void**)&d_y, 17*group_size*sizeof(Scalar) );
 
 	for ( int ii = 0; ii < 17*group_size; ++ii ){
 		h_x[ii] = 0.0;
@@ -547,7 +547,7 @@ void Debug_Lattice_SpinViscosity(
 	}
 
 	//
-	cudaMemcpy( d_x, h_x, 17*group_size*sizeof(float), cudaMemcpyHostToDevice );
+	cudaMemcpy( d_x, h_x, 17*group_size*sizeof(Scalar), cudaMemcpyHostToDevice );
 
         void *pBuffer;
         cudaMalloc( (void**)&pBuffer, res_data->pBufferSize );
@@ -569,16 +569,16 @@ void Debug_Lattice_SpinViscosity(
 			);
 
 	//
-	cudaMemcpy( h_y, &d_y[11*group_size], numel*sizeof(float), cudaMemcpyDeviceToHost );
+	cudaMemcpy( h_y, &d_y[11*group_size], numel*sizeof(Scalar), cudaMemcpyDeviceToHost );
 
 	//
 	Scalar3 L = box.getL();
-	float phi = 4 * 3.1415926536 / 3 * float(group_size) / (L.x*L.y*L.z);
-	float spin_viscosity = 0.0;
+	Scalar phi = 4 * 3.1415926536 / 3 * Scalar(group_size) / (L.x*L.y*L.z);
+	Scalar spin_viscosity = 0.0;
 	for ( int ii = 0; ii < group_size; ++ii ){
 		spin_viscosity += ( 6.0 * phi ) * ( 3.0 / 4.0 ) * (-1.0 / h_y[ 6*ii + 4 ] );
 	}
-	spin_viscosity /= float( group_size );
+	spin_viscosity /= Scalar( group_size );
 	
 	printf( "\n\nSPINVISCOSITY: %8.6f\n\n\n", spin_viscosity );
 
@@ -614,13 +614,13 @@ void Debug_Lattice_ShearViscosity(
 	int numel = 6 * group_size;
 
 	// Initialize input and output vector 
-	float *h_x, *d_x;
-	h_x = (float *)malloc( 17*group_size*sizeof(float) );
-	cudaMalloc( (void**)&d_x, 17*group_size*sizeof(float) );
+	Scalar *h_x, *d_x;
+	h_x = (Scalar *)malloc( 17*group_size*sizeof(Scalar) );
+	cudaMalloc( (void**)&d_x, 17*group_size*sizeof(Scalar) );
 	
-	float *h_y, *d_y;
-	h_y = (float *)malloc( 5*group_size*sizeof(float) );
-	cudaMalloc( (void**)&d_y, 17*group_size*sizeof(float) );
+	Scalar *h_y, *d_y;
+	h_y = (Scalar *)malloc( 5*group_size*sizeof(Scalar) );
+	cudaMalloc( (void**)&d_y, 17*group_size*sizeof(Scalar) );
         
 	void *pBuffer;
         cudaMalloc( (void**)&pBuffer, res_data->pBufferSize );
@@ -633,8 +633,8 @@ void Debug_Lattice_ShearViscosity(
 	float beta = 0.0;
 	for ( int jj = 0; jj < 2; ++jj ){
 
-		float E[5] = {0.0};
-		float P[5] = {0.0};
+		Scalar E[5] = {0.0};
+		Scalar P[5] = {0.0};
 		E[ jj ] = 1.0;
 		P[0] = 2 * E[0] + E[4];
 		P[1] = 2 * E[1];
@@ -649,7 +649,7 @@ void Debug_Lattice_ShearViscosity(
 		}
 
 		//
-		cudaMemcpy( d_x, h_x, 17*group_size*sizeof(float), cudaMemcpyHostToDevice );
+		cudaMemcpy( d_x, h_x, 17*group_size*sizeof(Scalar), cudaMemcpyHostToDevice );
 		
 		//
 		Solvers_Saddle(
@@ -684,16 +684,16 @@ void Debug_Lattice_ShearViscosity(
 								);
 
 		//
-		cudaMemcpy( h_y, &d_y[6*group_size], 5*group_size*sizeof(float), cudaMemcpyDeviceToHost );
+		cudaMemcpy( h_y, &d_y[6*group_size], 5*group_size*sizeof(Scalar), cudaMemcpyDeviceToHost );
 
 		//
 		Scalar3 L = box.getL();
-		float phi = 4 * 3.1415926536 / 3 * float(group_size) / (L.x*L.y*L.z);
-		float shear_viscosity = 0.0;
+		Scalar phi = 4 * 3.1415926536 / 3 * Scalar(group_size) / (L.x*L.y*L.z);
+		Scalar shear_viscosity = 0.0;
 		for ( int ii = 0; ii < group_size; ++ii ){
 			shear_viscosity += ( 5.0 / 2.0 * phi ) * ( h_y[ 5*ii + jj ] );
 		}
-		shear_viscosity /= float( group_size );
+		shear_viscosity /= Scalar( group_size );
 
 		if ( jj == 0 ){
 			alpha = 1.0 + shear_viscosity;
@@ -731,7 +731,7 @@ void Debug_Lattice_ShearViscosity(
 //    			int group_size,
 //    			int3 *d_image,
 //    			const BoxDim box,
-//    			float dt
+//    			Scalar dt
 //    			){
 //    
 //    	// Number of particles
@@ -753,13 +753,13 @@ void Debug_Lattice_ShearViscosity(
 //    
 //    
 //    	// Initialize input and output vector 
-//    	float *h_x, *d_x;
-//    	h_x = (float *)malloc( 17*N*sizeof(float) );
-//    	cudaMalloc( (void**)&d_x, 17*N*sizeof(float) );
+//    	Scalar *h_x, *d_x;
+//    	h_x = (Scalar *)malloc( 17*N*sizeof(Scalar) );
+//    	cudaMalloc( (void**)&d_x, 17*N*sizeof(Scalar) );
 //    	
-//    	float *h_y, *d_y;
-//    	h_y = (float *)malloc( (17*N)*sizeof(float) );
-//    	cudaMalloc( (void**)&d_y, (17*N)*sizeof(float) );
+//    	Scalar *h_y, *d_y;
+//    	h_y = (Scalar *)malloc( (17*N)*sizeof(Scalar) );
+//    	cudaMalloc( (void**)&d_y, (17*N)*sizeof(Scalar) );
 //    
 //    	for ( int ii = 0; ii < 17*N; ++ii ){
 //    		h_x[ii] = 0.0;
@@ -768,18 +768,18 @@ void Debug_Lattice_ShearViscosity(
 //    
 //    	//
 //    	int seed = bro_data->seed_nf;
-//    	float T = 1.0;
+//    	Scalar T = 1.0;
 //    
 //    	//
 //    	int nrepeats = 10;
-//    	float Dss = 0.0;
+//    	Scalar Dss = 0.0;
 //    	srand( 1 );
 //    	for ( int nn = 0; nn < nrepeats; ++nn ){
 //    
 //    		//for ( int ii = 0; ii < N; ++ii ){
-//    		//	h_x[ 11*N + 6*ii + 0 ] = sqrtf(3.0) * ( -1.0 + 2.0 * (float)( (double)rand() / (double)RAND_MAX ) );
-//    		//	h_x[ 11*N + 6*ii + 1 ] = sqrtf(3.0) * ( -1.0 + 2.0 * (float)( (double)rand() / (double)RAND_MAX ) );
-//    		//	h_x[ 11*N + 6*ii + 2 ] = sqrtf(3.0) * ( -1.0 + 2.0 * (float)( (double)rand() / (double)RAND_MAX ) );
+//    		//	h_x[ 11*N + 6*ii + 0 ] = sqrtf(3.0) * ( -1.0 + 2.0 * (Scalar)( (double)rand() / (double)RAND_MAX ) );
+//    		//	h_x[ 11*N + 6*ii + 1 ] = sqrtf(3.0) * ( -1.0 + 2.0 * (Scalar)( (double)rand() / (double)RAND_MAX ) );
+//    		//	h_x[ 11*N + 6*ii + 2 ] = sqrtf(3.0) * ( -1.0 + 2.0 * (Scalar)( (double)rand() / (double)RAND_MAX ) );
 //    		//}
 //    		Brownian_NearField_RNG_kernel<<< grid, threads >>>(
 //    									&d_x[11*N],
@@ -789,7 +789,7 @@ void Debug_Lattice_ShearViscosity(
 //    									dt
 //    									);
 //    		seed++;
-//    		cudaMemcpy( h_x, d_x, 17*N*sizeof(float), cudaMemcpyDeviceToHost );
+//    		cudaMemcpy( h_x, d_x, 17*N*sizeof(Scalar), cudaMemcpyDeviceToHost );
 //    		for ( int ii = 0; ii < N; ++ii ){
 //    			h_x[ 11*N + 6*ii + 0 ] *= sqrtf( dt / 2.0 );
 //    			h_x[ 11*N + 6*ii + 1 ] *= sqrtf( dt / 2.0 );
@@ -801,8 +801,8 @@ void Debug_Lattice_ShearViscosity(
 //    	
 //    			
 //    		// Copy to device
-//    		cudaMemcpy( d_x, h_x, 17*N*sizeof(float), cudaMemcpyHostToDevice );
-//    		cudaMemcpy( d_y, h_y, 17*N*sizeof(float), cudaMemcpyHostToDevice );
+//    		cudaMemcpy( d_x, h_x, 17*N*sizeof(Scalar), cudaMemcpyHostToDevice );
+//    		cudaMemcpy( d_y, h_y, 17*N*sizeof(Scalar), cudaMemcpyHostToDevice );
 //    
 //    		// Compute the velocity		
 //    		Solvers_Saddle(
@@ -819,20 +819,20 @@ void Debug_Lattice_ShearViscosity(
 //    				);
 //    		
 //    		// Copy to host
-//    		cudaMemcpy( h_y, d_y, 17*N*sizeof(float), cudaMemcpyDeviceToHost );
+//    		cudaMemcpy( h_y, d_y, 17*N*sizeof(Scalar), cudaMemcpyDeviceToHost );
 //    
 //    		// Compute the dot product
 //    		for ( int ii = 0; ii < N; ++ii ){
 //    
-//    			Dss += ( h_y[ 11*N + 6*ii + 0 ] * h_x[ 11*N + 6*ii + 0 ] ) * ( -1.0 / ( 3.0 * float(N) ) );
-//    			Dss += ( h_y[ 11*N + 6*ii + 1 ] * h_x[ 11*N + 6*ii + 1 ] ) * ( -1.0 / ( 3.0 * float(N) ) );
-//    			Dss += ( h_y[ 11*N + 6*ii + 2 ] * h_x[ 11*N + 6*ii + 2 ] ) * ( -1.0 / ( 3.0 * float(N) ) );
+//    			Dss += ( h_y[ 11*N + 6*ii + 0 ] * h_x[ 11*N + 6*ii + 0 ] ) * ( -1.0 / ( 3.0 * Scalar(N) ) );
+//    			Dss += ( h_y[ 11*N + 6*ii + 1 ] * h_x[ 11*N + 6*ii + 1 ] ) * ( -1.0 / ( 3.0 * Scalar(N) ) );
+//    			Dss += ( h_y[ 11*N + 6*ii + 2 ] * h_x[ 11*N + 6*ii + 2 ] ) * ( -1.0 / ( 3.0 * Scalar(N) ) );
 //    
 //    		}
 //    
 //    	}
 //    
-//    	Dss /= float( nrepeats );
+//    	Dss /= Scalar( nrepeats );
 //    
 //    	printf( "\n\nDss1 = %8.6f\n\n\n", Dss );
 //    	
@@ -858,7 +858,7 @@ void Debug_Lattice_ShearViscosity(
 //    			int group_size,
 //    			int3 *d_image,
 //    			const BoxDim box,
-//    			float dt
+//    			Scalar dt
 //    			){
 //    
 //    	// Number of particles
@@ -876,13 +876,13 @@ void Debug_Lattice_ShearViscosity(
 //    
 //    
 //    	// Initialize input and output vector 
-//    	float *h_x, *d_x;
-//    	h_x = (float *)malloc( 6*N*sizeof(float) );
-//    	cudaMalloc( (void**)&d_x, 6*N*sizeof(float) );
+//    	Scalar *h_x, *d_x;
+//    	h_x = (Scalar *)malloc( 6*N*sizeof(Scalar) );
+//    	cudaMalloc( (void**)&d_x, 6*N*sizeof(Scalar) );
 //    	
-//    	float *h_y, *d_y;
-//    	h_y = (float *)malloc( (6*N)*sizeof(float) );
-//    	cudaMalloc( (void**)&d_y, (6*N)*sizeof(float) );
+//    	Scalar *h_y, *d_y;
+//    	h_y = (Scalar *)malloc( (6*N)*sizeof(Scalar) );
+//    	cudaMalloc( (void**)&d_y, (6*N)*sizeof(Scalar) );
 //    
 //    	for ( int ii = 0; ii < 6*N; ++ii ){
 //    		h_x[ii] = 0.0;
@@ -890,11 +890,11 @@ void Debug_Lattice_ShearViscosity(
 //    	}
 //    
 //    	// Copy to device
-//    	cudaMemcpy( d_x, h_x, 6*N*sizeof(float), cudaMemcpyHostToDevice );
-//    	cudaMemcpy( d_y, h_y, 6*N*sizeof(float), cudaMemcpyHostToDevice );
+//    	cudaMemcpy( d_x, h_x, 6*N*sizeof(Scalar), cudaMemcpyHostToDevice );
+//    	cudaMemcpy( d_y, h_y, 6*N*sizeof(Scalar), cudaMemcpyHostToDevice );
 //    
 //    	int nrepeats = 100;
-//    	float Dss = 0.0;
+//    	Scalar Dss = 0.0;
 //    	srand( 1 );
 //    	for ( int nn = 0; nn < nrepeats; ++nn ){
 //    
@@ -922,20 +922,20 @@ void Debug_Lattice_ShearViscosity(
 //    						);
 //    		
 //    		// Copy to host
-//    		cudaMemcpy( h_y, d_y, 6*N*sizeof(float), cudaMemcpyDeviceToHost );
+//    		cudaMemcpy( h_y, d_y, 6*N*sizeof(Scalar), cudaMemcpyDeviceToHost );
 //    
 //    		// Compute the dot product
 //    		for ( int ii = 0; ii < N; ++ii ){
 //    
-//    			Dss += ( h_y[ 6*ii + 0 ] * h_y[ 6*ii + 0 ] ) * ( dt / ( 3.0 * float(N) * 2.0 ) );
-//    			Dss += ( h_y[ 6*ii + 1 ] * h_y[ 6*ii + 1 ] ) * ( dt / ( 3.0 * float(N) * 2.0 ) );
-//    			Dss += ( h_y[ 6*ii + 2 ] * h_y[ 6*ii + 2 ] ) * ( dt / ( 3.0 * float(N) * 2.0 ) );
+//    			Dss += ( h_y[ 6*ii + 0 ] * h_y[ 6*ii + 0 ] ) * ( dt / ( 3.0 * Scalar(N) * 2.0 ) );
+//    			Dss += ( h_y[ 6*ii + 1 ] * h_y[ 6*ii + 1 ] ) * ( dt / ( 3.0 * Scalar(N) * 2.0 ) );
+//    			Dss += ( h_y[ 6*ii + 2 ] * h_y[ 6*ii + 2 ] ) * ( dt / ( 3.0 * Scalar(N) * 2.0 ) );
 //    
 //    		}
 //    		
 //    	}
 //    
-//    	Dss /= float( nrepeats );
+//    	Dss /= Scalar( nrepeats );
 //    
 //    	printf( "\n\nDss2 = %8.6f\n\n\n", Dss );
 //    	

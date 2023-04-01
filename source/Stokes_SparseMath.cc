@@ -23,7 +23,7 @@ void Stokes::setSparseMath(){
 	// 
 	// Total Memory required for the arrays declared in this file:
 	// 	
-	//	sizeof(float) = sizeof(int) = 4
+	//	sizeof(Scalar) = sizeof(int) = 4
 	//	
 	//	nnz = 468 * N 
 	//	
@@ -35,15 +35,15 @@ void Stokes::setSparseMath(){
 	//	L_RowInd		nnz		int
 	//	L_RowPtr		6*N+1		int
 	//	L_ColInd		nnz		int		
-	//	L_Val			nnz		float
+	//	L_Val			nnz		Scalar
 	//	HasNeigh		N		int
-	//	Diag			6*N		float
+	//	Diag			6*N		Scalar
 	//	nneigh_less		N		int
 	//	NEPP			2*N		int
 	//	offset			N+1		int
-	//	Scratch1		6*N		float
-	//	Scratch2		17*N		float
-	//	Scratch3		nnz		float
+	//	Scratch1		6*N		Scalar
+	//	Scratch2		17*N		Scalar
+	//	Scratch3		nnz		Scalar
 	//	prcm			6*N		int
 	//
 	//				1960*N+3 \approx 1960*N
@@ -83,7 +83,7 @@ void Stokes::setSparseMath(){
 	GPUArray<int>   n_L_RowInd( m_nnz, m_exec_conf );	//!< Rnf preconditioner sparse storage ( COO Format - Row Indices )
 	GPUArray<int>   n_L_RowPtr( 6*N+1, m_exec_conf );	//!< Rnf preconditioner sparse storage ( CSR Format - Row Pointers )
 	GPUArray<int>   n_L_ColInd( m_nnz, m_exec_conf );	//!< Rnf preconditioner sparse storage ( COO/CSR Format - Col Indices )
-	GPUArray<float> n_L_Val(    m_nnz, m_exec_conf );	//!< Values of incomplete lower Cholesky of RFU (also the matrix itself)
+	GPUArray<Scalar> n_L_Val(    m_nnz, m_exec_conf );	//!< Values of incomplete lower Cholesky of RFU (also the matrix itself)
 
 	m_L_RowInd.swap(n_L_RowInd);
 	m_L_RowPtr.swap(n_L_RowPtr);
@@ -92,7 +92,7 @@ void Stokes::setSparseMath(){
 
 	// Things required for diagonal preconditioning
 	GPUArray<int>   n_HasNeigh( N, m_exec_conf );	//!< Whether a particle has neighbors or not
-	GPUArray<float> n_Diag( 6*N, m_exec_conf );	//!< Diagonal preconditioner elements 
+	GPUArray<Scalar> n_Diag( 6*N, m_exec_conf );	//!< Diagonal preconditioner elements 
 	m_Diag.swap( n_Diag );
 	m_HasNeigh.swap( n_HasNeigh );
 
@@ -108,9 +108,9 @@ void Stokes::setSparseMath(){
 	//
 	// Re-ordering vector and scratch space for sparse math operations
 	//
-	GPUArray<float> n_Scratch1( 6*N, m_exec_conf );		//!< Scratch storage for re-ordered matrix-vector multiplication 
-	GPUArray<float> n_Scratch2( 17*N, m_exec_conf );	//!< Scratch storage for saddle point preconditioning
-	GPUArray<float> n_Scratch3( m_nnz, m_exec_conf );	//!< Scratch Storage for Value reordering 
+	GPUArray<Scalar> n_Scratch1( 6*N, m_exec_conf );		//!< Scratch storage for re-ordered matrix-vector multiplication 
+	GPUArray<Scalar> n_Scratch2( 17*N, m_exec_conf );	//!< Scratch storage for saddle point preconditioning
+	GPUArray<Scalar> n_Scratch3( m_nnz, m_exec_conf );	//!< Scratch Storage for Value reordering 
 	GPUArray<int>   n_prcm( 6*N, m_exec_conf );		//!< matrix re-ordering vector using Reverse-Cuthill-Mckee (RCM)
 
 	m_Scratch1.swap( n_Scratch1 );

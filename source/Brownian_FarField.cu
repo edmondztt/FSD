@@ -70,10 +70,10 @@ __global__ void Brownian_FarField_RNG_Particle_kernel(
                 // detail::Saru s(idx, seed);
 
 		// Square root of 3
-		float sqrt3 = 1.732050807568877;
+		Scalar sqrt3 = 1.732050807568877;
 		
 		//
-		float randomx, randomy, randomz, randomw;
+		Scalar randomx, randomy, randomz, randomw;
 		// Edmond 03/31/2023:
 		hoomd::UniformDistribution<Scalar> uniform(Scalar(-sqrt3), Scalar(sqrt3));
 		// First bit 
@@ -224,24 +224,54 @@ __global__ void Brownian_FarField_RNG_Grid1of2_kernel(
 			     ( ii_nyquist && jj_nyquist && kk_nyquist ) ){
 	
 				// Since forces only have real part, they have to be rescaled to have variance 1	
-				float sqrt2 = 1.414213562373095;
-				gridX[idx] = make_scalar2( sqrt2*reX, 0.0 );
-				gridY[idx] = make_scalar2( sqrt2*reY, 0.0 );
-				gridZ[idx] = make_scalar2( sqrt2*reZ, 0.0 );
+				Scalar sqrt2 = 1.414213562373095;
+				// Edmond 03/31/2023: try to make it work with hipfftComplex:
+				CUFFTCOMPLEX sqrt2re;
+				sqrt2re.x = sqrt2*reX;
+				sqrt2re.y = 0.0;
+				gridX[idx] = sqrt2re;
+				sqrt2re.x = sqrt2*reY;
+				sqrt2re.y = 0.0;
+				gridY[idx] = sqrt2re;
+				sqrt2re.x = sqrt2*reZ;
+				sqrt2re.y = 0.0;
+				gridZ[idx] = sqrt2re;
+				
+				// gridX[idx] = make_scalar2( sqrt2*reX, 0.0 );
+				// gridY[idx] = make_scalar2( sqrt2*reY, 0.0 );
+				// gridZ[idx] = make_scalar2( sqrt2*reZ, 0.0 );
 
 			}
 			else {
 		
 
 				// Record Force
-				gridX[idx] = make_scalar2( reX, imX );
-				gridY[idx] = make_scalar2( reY, imY );
-				gridZ[idx] = make_scalar2( reZ, imZ );
+				// Edmond 03/31/2023
+				CUFFTCOMPLEX tmp;
+				tmp.x = reX;
+				tmp.y = imX;
+				gridX[idx] = tmp;
+				tmp.y = -imX;
+				gridX[conj_idx] = tmp;
+				tmp.x = reY;
+				tmp.y = imY;
+				gridY[idx] = tmp;
+				tmp.y = -imY;
+				gridY[conj_idx] = tmp;
+				tmp.x = reZ;
+				tmp.y = imZ;
+				gridZ[idx] = tmp;
+				tmp.y = -imZ;
+				gridZ[conj_idx] = tmp;
+				// gridX[idx] = make_scalar2( reX, imX );
+				// gridY[idx] = make_scalar2( reY, imY );
+				// gridZ[idx] = make_scalar2( reZ, imZ );
 				
 				// Conjugate points: F(k_conj) = conj( F(k) )
-				gridX[conj_idx] = make_scalar2( reX, -imX );
-				gridY[conj_idx] = make_scalar2( reY, -imY );
-				gridZ[conj_idx] = make_scalar2( reZ, -imZ );
+
+				// gridX[conj_idx] = make_scalar2( reX, -imX );
+				// gridY[conj_idx] = make_scalar2( reY, -imY );
+				// gridZ[conj_idx] = make_scalar2( reZ, -imZ );
 				
 			} // Check for Nyquist
 		
@@ -315,9 +345,12 @@ __global__ void Brownian_FarField_RNG_Grid2of2_kernel(
 		Scalar k = sqrtf( ksq );
 
 		// Fluctuating force values
-		Scalar2 fX = gridX[ idx ];
-		Scalar2 fY = gridY[ idx ];
-		Scalar2 fZ = gridZ[ idx ];
+		CUFFTCOMPLEX tmp = gridX[ idx ];
+		Scalar2 fX = make_scalar2(tmp.x, tmp.y);
+		tmp = gridY[ idx ];
+		Scalar2 fY = make_scalar2(tmp.x, tmp.y);
+		tmp = gridZ[ idx ];
+		Scalar2 fZ = make_scalar2(tmp.x, tmp.y);
 	
 		// Scaling factors for the current grid
 		Scalar B = ( idx == 0 ) ? 0.0 : sqrtf( tk.w );
@@ -672,7 +705,7 @@ void Brownian_FarField_Lanczos(
 	}
 
 	// Tm = W * W1 = W * Lambda^(1/2) * W^T * e1
-	float tempsum;
+	Scalar tempsum;
 	for ( int ii = 0; ii < m; ++ii ){
 	    tempsum = 0.0;
 	    for ( int jj = 0; jj < m; ++jj ){
@@ -818,7 +851,7 @@ void Brownian_FarField_Lanczos(
 		    W1[ii] = sqrtf( alpha[ii] ) * W[ii];
 		}
 		// Tm = W * W1 = W * Lambda^(1/2) * W^T * e1
-		float tempsum;
+		Scalar tempsum;
 		for ( int ii = 0; ii < m; ++ii ){
 		    tempsum = 0.0;
 		    for ( int jj = 0; jj < m; ++jj ){
@@ -903,7 +936,7 @@ void Brownian_FarField_Lanczos(
 
 */
 void Brownian_FarField_SlipVelocity(	
-					float *d_Uslip_ff,
+					Scalar *d_Uslip_ff,
 					Scalar4 *d_pos,
                         	        unsigned int *d_group_members,
                         	        unsigned int group_size,
@@ -1023,7 +1056,7 @@ void Brownian_FarField_SlipVelocity(
 		cufftExecC2C( mob_data->plan, mob_data->gridZY, mob_data->gridZY, CUFFT_INVERSE);
 		
 		// Evaluate contribution of grid velocities at particle centers
-		Mobility_WaveSpace_ContractU<<<Cgrid, Cthreads, (B*B*B+1)*sizeof(float3)>>>(
+		Mobility_WaveSpace_ContractU<<<Cgrid, Cthreads, (B*B*B+1)*sizeof(Scalar3)>>>(
 												d_pos,
 												d_vel,
 												mob_data->gridX,
@@ -1042,7 +1075,7 @@ void Brownian_FarField_SlipVelocity(
 												quadW*prefac,
 												expfac
 												);
-		Mobility_WaveSpace_ContractD<<<Cgrid, Cthreads, (2*B*B*B+1)*sizeof(float4)>>>(
+		Mobility_WaveSpace_ContractD<<<Cgrid, Cthreads, (2*B*B*B+1)*sizeof(Scalar4)>>>(
 												d_pos,
 												d_delu,
 												mob_data->gridXX,

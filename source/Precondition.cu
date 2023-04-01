@@ -35,9 +35,9 @@
 #include <assert.h>
 #endif
 
-//! Command to convert floats or doubles to integers
+//! Command to convert Scalars or doubles to integers
 #ifdef SINGLE_PRECISION
-#define __scalar2int_rd __float2int_rd
+#define __scalar2int_rd __Scalar2int_rd
 #else
 #define __scalar2int_rd __double2int_rd
 #endif
@@ -82,7 +82,7 @@ __global__ void Precondition_GetPrunedNneigh_kernel(
 							const unsigned int *d_group_members,
 							const unsigned int *d_nneigh, 
 							const unsigned int *d_nlist, 
-							const unsigned int *d_headlist,
+							const long unsigned int *d_headlist,
 							const Scalar rp
 							){
 
@@ -165,7 +165,7 @@ __global__ void Precondition_GetPrunedNlist_kernel(
 							const unsigned int *d_group_members,
 							const unsigned int *d_nneigh, 
 							const unsigned int *d_nlist, 
-							const unsigned int *d_headlist,
+							const long unsigned int *d_headlist,
 							const Scalar rp
 							){
 
@@ -181,7 +181,7 @@ __global__ void Precondition_GetPrunedNlist_kernel(
 		// Particle info for this thread
 		unsigned int idx = d_group_members[ tidx ];
 		
-		unsigned int head_idx = d_headlist[ idx ]; // Location in head array for neighbors of current particle
+		long unsigned int head_idx = d_headlist[ idx ]; // Location in head array for neighbors of current particle
 		unsigned int nneigh   = d_nneigh[ idx ];   // Number of neighbors of the nearest particle
 		
 		// Particle info for this thread, pruned
@@ -382,7 +382,7 @@ __global__ void Precondition_HasNeigh_kernel(
 						const unsigned int *d_group_members,
 						const unsigned int *d_nneigh, 
 						const unsigned int *d_nlist, 
-						const unsigned int *d_headlist,
+						const long unsigned int *d_headlist,
 						const Scalar rlub
 						){
 
@@ -398,7 +398,7 @@ __global__ void Precondition_HasNeigh_kernel(
 		// Particle info for this thread
 		unsigned int idx = d_group_members[ tidx ];
 		
-		unsigned int head_idx = d_headlist[ idx ]; // Location in head array for neighbors of current particle
+		long unsigned int head_idx = d_headlist[ idx ]; // Location in head array for neighbors of current particle
 		unsigned int nneigh = d_nneigh[ idx ];   // Number of neighbors of the nearest particle
 
 		// Position of current particle
@@ -540,18 +540,18 @@ __global__ void Precondition_RFU_kernel(
 					const unsigned int *d_nneigh, 
 					unsigned int *d_nneigh_less, 
 					unsigned int *d_nlist, 
-					const unsigned int *d_headlist, 
+					const long unsigned int *d_headlist, 
 					unsigned int *d_NEPP,
 					unsigned int *d_offset, 
 					Scalar4 *d_pos,
 			      		BoxDim box,
 					const Scalar *d_ResTable_dist,
 					const Scalar *d_ResTable_vals,
-					const float table_min,
-					const float table_dr,
+					const Scalar table_min,
+					const Scalar table_dr,
 					int   *d_L_RowInd,
 					int   *d_L_ColInd,
-					float *d_L_Val,
+					Scalar *d_L_Val,
 					const Scalar rp
 					){
 
@@ -569,7 +569,7 @@ __global__ void Precondition_RFU_kernel(
 		
     Scalar4 posi = d_pos[ curr_particle ];
 			
-    unsigned int head_idx = d_headlist[ curr_particle ];	// Location in head array for neighbors of current particle
+    long unsigned int head_idx = d_headlist[ curr_particle ];	// Location in head array for neighbors of current particle
     unsigned int nneigh = d_nneigh[ curr_particle ];		// Number of neighbors of the nearest particle
     unsigned int nneigh_less = d_nneigh_less[ curr_particle ]; 	// Number of neighbors with index less than current particle
 
@@ -717,13 +717,13 @@ __global__ void Precondition_RFU_kernel(
 	// Indices needed to write things out
 	unsigned int col_neigh, col_self;
 	int oind_neigh, oind_self;
-	float A_neigh, A_self;
-	float B_neigh, B_self;
-	float C_neigh, C_self;
-	float rr, Imrr;
+	Scalar A_neigh, A_self;
+	Scalar B_neigh, B_self;
+	Scalar C_neigh, C_self;
+	Scalar rr, Imrr;
 				
 	// Delta functions needed to evaluate resistance tensors
-	float delta_ij;
+	Scalar delta_ij;
 	
 	//
 	// Compute FU Block
@@ -881,18 +881,18 @@ void Precondition_Build(
 				const unsigned int *d_nneigh, 
 				unsigned int *d_nneigh_less, 
 				unsigned int *d_nlist, 
-				const unsigned int *d_headlist, 
+				const long unsigned int *d_headlist, 
 				unsigned int *d_NEPP,
 				unsigned int *d_offset, 
 				const Scalar *d_ResTable_dist,
 				const Scalar *d_ResTable_vals,
-				const float table_min,
-				const float table_dr,
+				const Scalar table_min,
+				const Scalar table_dr,
 				int &nnz,
 				int   *d_L_RowInd,
 				int   *d_L_RowPtr,
 				int   *d_L_ColInd,
-				float *d_L_Val,
+				Scalar *d_L_Val,
 				cusparseHandle_t spHandle,
 				const Scalar rp,
 				dim3 grid,
@@ -961,11 +961,11 @@ void Precondition_Reorder(
 				unsigned int *d_nneigh_pruned,
 				int   *d_L_RowPtr,
 				int   *d_L_ColInd,
-				float *d_L_Val,
+				Scalar *d_L_Val,
 				cusolverSpHandle_t soHandle,
 				cusparseHandle_t spHandle,
 				cusparseMatDescr_t descr_R,
-				float *d_Scratch3,
+				Scalar *d_Scratch3,
 				dim3 grid,
 				dim3 threads,
 				int *d_scratch,
@@ -1077,7 +1077,7 @@ void Precondition_Reorder(
 			
 	// Apply the map to the values as well
 	Precondition_Map_kernel<<< val_grid, val_threads >>>( d_Scratch3, d_L_Val, d_map, nnz );
-	cudaMemcpy( d_L_Val, d_Scratch3, nnz*sizeof(float), cudaMemcpyDeviceToDevice );	
+	cudaMemcpy( d_L_Val, d_Scratch3, nnz*sizeof(Scalar), cudaMemcpyDeviceToDevice );	
 
 	//
 	// Clean Up
@@ -1125,7 +1125,7 @@ void Precondition_IChol(
 			unsigned int nnz,
 			int   *d_L_RowPtr,
 			int   *d_L_ColInd,
-			float *d_L_Val,
+			Scalar *d_L_Val,
 			cusparseHandle_t spHandle,
         		cusparseStatus_t spStatus,
 			cusparseMatDescr_t    descr_R, 
@@ -1141,7 +1141,7 @@ void Precondition_IChol(
 			int& pBufferSize,
 			dim3 grid,
 			dim3 threads,
-			float &ichol_relaxer,
+			Scalar &ichol_relaxer,
 			bool &ichol_converged
 			){
 		
@@ -1161,7 +1161,7 @@ void Precondition_IChol(
         int pBufferSize_L = 0;  // Buffer size required for calculations on L
         int pBufferSize_Lt = 0; // Buffer size required for calculations on L^T
 
-        cusparseScsric02_bufferSize(
+        cusparseDcsric02_bufferSize(
         					spHandle,
         					6*group_size,
         					nnz,
@@ -1172,8 +1172,9 @@ void Precondition_IChol(
         					info_R,
         					&pBufferSize_R
         					);
- 
-	cusparseScsrsv2_bufferSize(
+//  Edmond 03/31/2023: 
+// 	actually cannot find cusparseScsrsv2_bufferSize, but changed it to cusparseDcsrsv2_bufferSize
+	cusparseDcsrsv2_bufferSize(
 						spHandle,
 						trans_L,
 						6*group_size,
@@ -1186,7 +1187,7 @@ void Precondition_IChol(
 						&pBufferSize_L
 						);
 	
-	cusparseScsrsv2_bufferSize(
+	cusparseDcsrsv2_bufferSize(
 						spHandle,
 						trans_Lt,
 						6*group_size,
@@ -1209,7 +1210,9 @@ void Precondition_IChol(
         int structural_zero;
 
         // 4. Pre-solve analysis
-        cusparseScsric02_analysis(
+		// Edmond 03/31/2023:
+		// seems these functions are from jcuda http://www.jcuda.org/jcuda/jcusparse/doc/jcuda/jcusparse/JCusparse.html
+        cusparseDcsric02_analysis(
 						spHandle,
 						6*group_size,
 						nnz,
@@ -1222,7 +1225,7 @@ void Precondition_IChol(
 						pBuffer
 						);
 
-	cusparseScsrsv2_analysis(
+	cusparseDcsrsv2_analysis(
 						spHandle,
 						trans_L,
 						6*group_size,
@@ -1236,7 +1239,7 @@ void Precondition_IChol(
 						pBuffer
 						);
 
-        cusparseScsrsv2_analysis(
+        cusparseDcsrsv2_analysis(
 						spHandle,
 						trans_Lt,
 						6*group_size,
@@ -1259,7 +1262,7 @@ void Precondition_IChol(
 		
         // 5. Perform incomplete Cholesky decomposition, (RFUnf + I) = L * L'
 	//
-	spStatus = cusparseScsric02(
+	spStatus = cusparseDcsric02(
 					spHandle,
 					6*group_size,
 					nnz,
@@ -1523,8 +1526,8 @@ void Precondition_Wrap(
 
 */
 void Precondition_Brownian_RFUmultiply(	
-					float *d_y, // output
-					float *d_x, // input
+					Scalar *d_y, // output
+					Scalar *d_x, // input
 					const Scalar4 *d_pos,
 					unsigned int *d_group_members,
 					const int group_size, 
@@ -1539,16 +1542,16 @@ void Precondition_Brownian_RFUmultiply(
 	dim3 threads = (ker_data->particle_threads);
 
 	// Pointer to scratch array
-	float *d_z = (res_data->Scratch1);
+	Scalar *d_z = (res_data->Scratch1);
 
 	// Number of elements of the arrays
 	int numel = 6 * group_size;
 
 	// Variable required for Axpy
-	float spAlpha = 1.0;
+	Scalar spAlpha = 1.0;
 	
 	// First incomplete Cholesky Solve: solve L'*y = x
-	cusparseScsrsv2_solve(
+	cusparseDcsrsv2_solve(
 				res_data->spHandle, 
 				res_data->trans_Lt, 
 				numel, 
@@ -1629,7 +1632,7 @@ void Precondition_Brownian_RFUmultiply(
 								);
 	
 	// Second incomplete Cholesky solve: solve L*y = x
-	cusparseScsrsv2_solve(
+	cusparseDcsrsv2_solve(
 				res_data->spHandle, 
 				res_data->trans_L, 
 				numel, 
@@ -1671,7 +1674,7 @@ void Precondition_Brownian_RFUmultiply(
 
 */
 void Precondition_Brownian_Undo(	
-				float *d_x,       // input/output
+				Scalar *d_x,       // input/output
 				int group_size,
 				KernelData *ker_data,
 				ResistanceData *res_data
@@ -1682,15 +1685,15 @@ void Precondition_Brownian_Undo(
 	dim3 threads = ker_data->particle_threads;
 
 	// Pointer to scratch array
-	float *d_z = (res_data->Scratch1);
+	Scalar *d_z = (res_data->Scratch1);
 
 	// Number of elements in vectors
 	int numel = 6*group_size;
 	
 	// Incomplete Cholesky multiplication
-        float spAlpha = 1.0;
-        float spBeta = 0.0;
-        cusparseScsrmv(
+        Scalar spAlpha = 1.0;
+        Scalar spBeta = 0.0;
+        cusparseDcsrmv(
                         res_data->spHandle,
                         res_data->trans_L,
                         numel,
@@ -1776,15 +1779,15 @@ void Precondition_Brownian_Undo(
 
 */
 void Precondition_Saddle_RFUmultiply(	
-					float *d_y,       // output
-					float *d_x,       // input
-					float *d_Scratch, // intermediate storage
+					Scalar *d_y,       // output
+					Scalar *d_x,       // input
+					Scalar *d_Scratch, // intermediate storage
 					const int *d_prcm,
 					int group_size,
 					unsigned int nnz,
 					const int   *d_L_RowPtr,
 					const int   *d_L_ColInd,
-					const float *d_L_Val,
+					const Scalar *d_L_Val,
 					cusparseHandle_t spHandle,
         				cusparseStatus_t spStatus,
 					cusparseMatDescr_t descr_L,
@@ -1800,7 +1803,7 @@ void Precondition_Saddle_RFUmultiply(
 					){
 
 	// Variable required for Axpy
-	float spAlpha = 1.0;
+	Scalar spAlpha = 1.0;
 
 	// Vector length
 	int numel = 6 * group_size;
@@ -1818,7 +1821,7 @@ void Precondition_Saddle_RFUmultiply(
 	// Incomplete Cholesky solve
 	
 	// first: solve L*y = x
-	cusparseScsrsv2_solve(
+	cusparseDcsrsv2_solve(
 				spHandle, 
 				trans_L, 
 				numel,
@@ -1836,7 +1839,7 @@ void Precondition_Saddle_RFUmultiply(
 				);
 	
 	// second: solve L'*z = y
-	cusparseScsrsv2_solve(
+	cusparseDcsrsv2_solve(
 				spHandle, 
 				trans_Lt, 
 				numel, 

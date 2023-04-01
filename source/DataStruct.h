@@ -66,7 +66,7 @@ struct KernelData
 //! Declare a structure to hold all of the Brownian calculation information
 struct BrownianData
 {
-	float tol;	//!< Tolerance for the Brownian approximation (should be same as all other errors)
+	Scalar tol;	//!< Tolerance for the Brownian approximation (should be same as all other errors)
 
 	unsigned int timestep;	//!< Simulation time step (used by RNG)
 	
@@ -78,9 +78,9 @@ struct BrownianData
 	int m_Lanczos_ff;	//!< Number of Lanczos iterations for the far-field Brownian calculation
 	int m_Lanczos_nf;	//!< Number of Lanczos iterations for the near-field Brownian calculation
 
-	float T;	//!< Temperature
+	Scalar T;	//!< Temperature
 
-	float rfd_epsilon;	//!< epsilon for RFD approximation
+	Scalar rfd_epsilon;	//!< epsilon for RFD approximation
 };
 
 //! Declare a structure to hold all of the mobility calculation information
@@ -125,8 +125,8 @@ struct MobilityData
 struct ResistanceData
 {
 
-	float rlub;	//!< cutoff distance for lubrication
-	float rp;	//!< cutoff distance for preconditioner
+	Scalar rlub;	//!< cutoff distance for lubrication
+	Scalar rp;	//!< cutoff distance for preconditioner
 
 	unsigned int *nneigh;		//!< Lubrication interaction number of neighbors
 	unsigned int *nlist;		//!< Lubrication interaction neighbor list
@@ -144,12 +144,12 @@ struct ResistanceData
 	int   *L_RowInd;	//!< Lubrication preconditioner, sparse storage, row indices
 	int   *L_RowPtr;	//!< Lubrication preconditioner, sparse storage, row pointers
 	int   *L_ColInd;	//!< Lubrication preconditioner, sparse storage, column indices
-	float *L_Val;		//!< Lubrication preconditioner, sparse storage, values
+	Scalar *L_Val;		//!< Lubrication preconditioner, sparse storage, values
 
 	double *table_dist;	//!< Resistance tabulation distances
 	double *table_vals; 	//!< Resistance tabulation values
-	float table_min;	//!< Resistance tabulation shortest distance
-	float table_dr;		//!< Resistance tabulation discretization
+	Scalar table_min;	//!< Resistance tabulation shortest distance
+	Scalar table_dr;		//!< Resistance tabulation discretization
 
         cusolverSpHandle_t soHandle;		//!< Opaque handle to cuSOLVER
         cusparseHandle_t spHandle;		//!< Opaque handle to cuSPARSE
@@ -167,26 +167,26 @@ struct ResistanceData
         
 	int pBufferSize;			//!< Buffer size for cuSPARSE oeprations
 
-	float *Scratch1;	//!< Scratch vector for in-place calculations (size 6*N)
-	float *Scratch2;	//!< Scratch vector for in-place calculations (size 17*N)
-	float *Scratch3;	//!< Scratch vector for re-ordering values (size nnz)
+	Scalar *Scratch1;	//!< Scratch vector for in-place calculations (size 6*N)
+	Scalar *Scratch2;	//!< Scratch vector for in-place calculations (size 17*N)
+	Scalar *Scratch3;	//!< Scratch vector for re-ordering values (size nnz)
 
 	int *prcm;	//!< Reverse-Cuthill-McKee permutation vector
 
 	int *HasNeigh;	//!< List for whether a particle has neighbors or not
-	float *Diag;	//!< Diagonal preconditioner for Brownian calculation
+	Scalar *Diag;	//!< Diagonal preconditioner for Brownian calculation
 
-	float ichol_relaxer;	//!< magnitude of term to add to diagonal for IChol
+	Scalar ichol_relaxer;	//!< magnitude of term to add to diagonal for IChol
 	bool ichol_converged;	//!< flag for whether the incomplete Cholesky converged
 
 	cublasHandle_t blasHandle;	//!< Opaque handle for cuBLAS operations
 
   // Interparticle force parameters
-  float m_ndsr;      //non-dimensional shear rate                       
-  float m_k_n;	     //collision spring const                           
-  float m_kappa;     //inverse Debye length for electrostatic repulsion 
-  float m_beta;      // ratio of Hamaker constant and electrostatic force scale
-  float m_epsq;      // square root of the regularization term for vdW
+  Scalar m_ndsr;      //non-dimensional shear rate                       
+  Scalar m_k_n;	     //collision spring const                           
+  Scalar m_kappa;     //inverse Debye length for electrostatic repulsion 
+  Scalar m_beta;      // ratio of Hamaker constant and electrostatic force scale
+  Scalar m_epsq;      // square root of the regularization term for vdW
   
 };
 
