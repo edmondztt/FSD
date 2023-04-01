@@ -540,7 +540,7 @@ __global__ void Precondition_RFU_kernel(
 					const unsigned int *d_nneigh, 
 					unsigned int *d_nneigh_less, 
 					unsigned int *d_nlist, 
-					const long unsigned int *d_headlist, 
+					const unsigned int *d_headlist, 
 					unsigned int *d_NEPP,
 					unsigned int *d_offset, 
 					Scalar4 *d_pos,
@@ -569,7 +569,7 @@ __global__ void Precondition_RFU_kernel(
 		
     Scalar4 posi = d_pos[ curr_particle ];
 			
-    long unsigned int head_idx = d_headlist[ curr_particle ];	// Location in head array for neighbors of current particle
+    unsigned int head_idx = d_headlist[ curr_particle ];	// Location in head array for neighbors of current particle
     unsigned int nneigh = d_nneigh[ curr_particle ];		// Number of neighbors of the nearest particle
     unsigned int nneigh_less = d_nneigh_less[ curr_particle ]; 	// Number of neighbors with index less than current particle
 
@@ -881,7 +881,7 @@ void Precondition_Build(
 				const unsigned int *d_nneigh, 
 				unsigned int *d_nneigh_less, 
 				unsigned int *d_nlist, 
-				const long unsigned int *d_headlist, 
+				const unsigned int *d_headlist, 
 				unsigned int *d_NEPP,
 				unsigned int *d_offset, 
 				const Scalar *d_ResTable_dist,
@@ -1693,7 +1693,11 @@ void Precondition_Brownian_Undo(
 	// Incomplete Cholesky multiplication
         Scalar spAlpha = 1.0;
         Scalar spBeta = 0.0;
+		// Edmond 03/31/2023: 
+		// seems cusparseCsrmvEx replaced cusparseDcsrmv: https://forums.developer.nvidia.com/t/cusparsedcsrmv-is-undefined/221999/2
+		// it probably only works for cuda 10.1
         cusparseDcsrmv(
+		// cusparseCsrmvEx(
                         res_data->spHandle,
                         res_data->trans_L,
                         numel,
