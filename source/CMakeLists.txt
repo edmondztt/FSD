@@ -122,4 +122,3 @@ install(FILES ${files}
 
 copy_files_to_build("${files}" "${COMPONENT_NAME}" "*.py")
 
-add_custom_target(copy_${COMPONENT_NAME} ALL DEPENDS ${files})
