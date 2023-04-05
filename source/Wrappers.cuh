@@ -40,7 +40,7 @@
 #endif
 
 using namespace hoomd;
-using namespace hoomd::md;
+// using namespace hoomd::md;
 
 /*! \file Wrappers.cuh
     \brief Defines functions wrappers used by CUSP to solve the linear equations where required.
