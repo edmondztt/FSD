@@ -73,36 +73,37 @@ set( CUBLAS_LIBRARY ${CUBLAS_LIBRARY} )
 # link the library to its dependencies
 target_link_libraries(_${COMPONENT_NAME} PUBLIC HOOMD::_hoomd PRIVATE ${LAPACK_LIBRARIES} ${CUBLAS_LIBRARY})
 
-# if we are compiling with MPI support built in, set appropriate
-# compiler/linker flags
-if (ENABLE_MPI)
-   if(MPI_COMPILE_FLAGS)
-       set_target_properties(_${COMPONENT_NAME} PROPERTIES COMPILE_FLAGS "${MPI_CXX_COMPILE_FLAGS}")
-   endif(MPI_COMPILE_FLAGS)
-   if(MPI_LINK_FLAGS)
-       set_target_properties(_${COMPONENT_NAME} PROPERTIES LINK_FLAGS "${MPI_CXX_LINK_FLAGS}")
-   endif(MPI_LINK_FLAGS)
-endif(ENABLE_MPI)
+# Edmond 04/04/2023: comment out this part to debug -pthread repeats
+# # if we are compiling with MPI support built in, set appropriate
+# # compiler/linker flags
+# if (ENABLE_MPI)
+#    if(MPI_COMPILE_FLAGS)
+#        set_target_properties(_${COMPONENT_NAME} PROPERTIES COMPILE_FLAGS "${MPI_CXX_COMPILE_FLAGS}")
+#    endif(MPI_COMPILE_FLAGS)
+#    if(MPI_LINK_FLAGS)
+#        set_target_properties(_${COMPONENT_NAME} PROPERTIES LINK_FLAGS "${MPI_CXX_LINK_FLAGS}")
+#    endif(MPI_LINK_FLAGS)
+# endif(ENABLE_MPI)
 
 fix_cudart_rpath(_${COMPONENT_NAME})
 
 # install the library
 install(TARGETS _${COMPONENT_NAME}
-        LIBRARY DESTINATION ${PYTHON_MODULE_BASE_DIR}/${COMPONENT_NAME}
+        LIBRARY DESTINATION ${PYTHON_SITE_INSTALL_DIR}/${COMPONENT_NAME}
         )
 
 ################ Python only modules
-# copy python modules to the build directory to make it a working python package
-MACRO(copy_file file)
-    add_custom_command (
-        OUTPUT ${file}
-        DEPENDS ${file}
-        POST_BUILD
-        COMMAND    ${CMAKE_COMMAND}
-        ARGS       -E copy ${CMAKE_CURRENT_SOURCE_DIR}/${file} ${CMAKE_CURRENT_BINARY_DIR}/${file}
-        COMMENT    "Copy hoomd/${COMPONENT_NAME}/${file}"
-    )
-ENDMACRO(copy_file)
+# # copy python modules to the build directory to make it a working python package
+# MACRO(copy_file file)
+#     add_custom_command (
+#         OUTPUT ${file}
+#         DEPENDS ${file}
+#         POST_BUILD
+#         COMMAND    ${CMAKE_COMMAND}
+#         ARGS       -E copy ${CMAKE_CURRENT_SOURCE_DIR}/${file} ${CMAKE_CURRENT_BINARY_DIR}/${file}
+#         COMMENT    "Copy hoomd/${COMPONENT_NAME}/${file}"
+#     )
+# ENDMACRO(copy_file)
 
 set(files
     __init__.py
@@ -112,11 +113,13 @@ set(files
     )
 
 install(FILES ${files}
-        DESTINATION ${PYTHON_MODULE_BASE_DIR}/${COMPONENT_NAME}
+        DESTINATION ${PYTHON_SITE_INSTALL_DIR}/${COMPONENT_NAME}
        )
 
-foreach(file ${files})
-    copy_file(${file})
-endforeach()
+# foreach(file ${files})
+#     copy_file(${file})
+# endforeach()
+
+copy_files_to_build("${files}" "${COMPONENT_NAME}" "*.py")
 
 add_custom_target(copy_${COMPONENT_NAME} ALL DEPENDS ${files})
