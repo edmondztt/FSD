@@ -61,6 +61,8 @@ if( LAPACK_LIBRARIES-NOTFOUND )
 endif( LAPACK_LIBRARIES-NOTFOUND )
 message(STATUS  "found lapack libraries: ${LAPACK_LIBRARIES}")
 set( LAPACK_LIBRARIES ${LAPACKE_LIBRARIES} ${LAPACK_LIBRARIES} ${CBLAS_LIBRARIES}  ${BLAS_LIBRARIES} )
+target_include_directories(_${COMPONENT_NAME} PUBLIC /usr/local/lapack-3.6.0/)
+#include_directories(/usr/local/lapack-3.6.0/)
 
 # Find CUBLAS
 find_library( CUBLAS_LIBRARY cublas PATHS /usr/local/cuda/lib64 )

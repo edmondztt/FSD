@@ -31,7 +31,7 @@
 //#include <hoomd/ForceCompute.h> //zhoge//RK2//////
 
 // Edmond 03/31/2023: try to mimic PPPMForceComputeGPU & CommunicatorGridGPU for HIP
-#include "hip/hip_runtime.h"
+//#include "hip/hip_runtime.h"
 
 #if defined(ENABLE_HIP)
 #ifdef __HIP_PLATFORM_HCC__
