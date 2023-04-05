@@ -58,7 +58,9 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Helper_Mobility.cuh"
 #include "Helper_Saddle.cuh"
 
-#include "hoomd/Saru.h"
+
+#include "hoomd/RNGIdentifiers.h"
+#include "hoomd/RandomNumbers.h"
 #include "hoomd/TextureTools.h"
 
 #include <stdio.h>

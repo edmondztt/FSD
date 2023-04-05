@@ -70,7 +70,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <stdio.h>
 
-#include "hoomd/Saru.h"
+// #include "hoomd/Saru.h"
 #include "hoomd/TextureTools.h"
 
 #include <cuda_runtime.h>
