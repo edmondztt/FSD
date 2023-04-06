@@ -1051,7 +1051,7 @@ __global__ void Mobility_RealSpace_kernel(
 			      		BoxDim box,
 			      		const unsigned int *d_nneigh,
                         const unsigned int *d_nlist,
-                        const unsigned int *d_headlist
+                        const long unsigned int *d_headlist
 						){
  
 	// Index for current thread 
