@@ -342,17 +342,17 @@ __global__ void Mobility_WaveSpace_Green_kernel(
 		//
 
 		// Read the FFT force from global memory
-		Scalar2 fX = gridX[tid];  
-		Scalar2 fY = gridY[tid];
-		Scalar2 fZ = gridZ[tid];
-		Scalar2 cXX = gridXX[tid];
-		Scalar2 cXY = gridXY[tid];
-		Scalar2 cXZ = gridXZ[tid];
-		Scalar2 cYX = gridYX[tid];
-		Scalar2 cYY = gridYY[tid];
-		Scalar2 cYZ = gridYZ[tid];
-		Scalar2 cZX = gridZX[tid];
-		Scalar2 cZY = gridZY[tid];
+		Scalar2 fX = make_scalar2(gridX[tid].x, gridX[tid].y);  
+		Scalar2 fY = make_scalar2(gridY[tid].x, gridY[tid].y);
+		Scalar2 fZ = make_scalar2(gridZ[tid].x, gridZ[tid].y);
+		Scalar2 cXX = make_scalar2(gridXX[tid].x, gridXX[tid].y);
+		Scalar2 cXY = make_scalar2(gridXY[tid].x, gridXY[tid].y);
+		Scalar2 cXZ = make_scalar2(gridXZ[tid].x, gridXZ[tid].y);
+		Scalar2 cYX = make_scalar2(gridYX[tid].x, gridYX[tid].y);
+		Scalar2 cYY = make_scalar2(gridYY[tid].x, gridYY[tid].y);
+		Scalar2 cYZ = make_scalar2(gridYZ[tid].x, gridYZ[tid].y);
+		Scalar2 cZX = make_scalar2(gridZX[tid].x, gridZX[tid].y);
+		Scalar2 cZY = make_scalar2(gridZY[tid].x, gridZY[tid].y);
 		Scalar2 cZZ = make_scalar2( -(cXX.x+cYY.x), -(cXX.y+cYY.y) );		
 
 		// Current wave-space vector 
@@ -413,9 +413,16 @@ __global__ void Mobility_WaveSpace_Green_kernel(
 		Scalar B = (tid==0) ? 0.0 : tk.w * ( sinf( k ) / k ) * ( sinf( k ) / k );
 	
 		// Velocity calculation
-		gridX[tid] = make_scalar2( ( fX.x - tk.x * kdF.x ) * B, ( fX.y - tk.x * kdF.y ) * B );
-		gridY[tid] = make_scalar2( ( fY.x - tk.y * kdF.x ) * B, ( fY.y - tk.y * kdF.y ) * B );
-		gridZ[tid] = make_scalar2( ( fZ.x - tk.z * kdF.x ) * B, ( fZ.y - tk.z * kdF.y ) * B );
+		CUFFTCOMPLEX tmp;
+		tmp.x = ( fX.x - tk.x * kdF.x ) * B;
+		tmp.y = ( fX.y - tk.x * kdF.y ) * B ;
+		gridX[tid] = tmp ;
+		tmp.x = ( fY.x - tk.y * kdF.x ) * B;
+		tmp.y = ( fY.y - tk.y * kdF.y ) * B;
+		gridY[tid] = tmp;
+		tmp.x = ( fZ.x - tk.z * kdF.x ) * B;
+		tmp.y = ( fZ.y - tk.z * kdF.y ) * B;
+		gridZ[tid] = tmp;
 
 		//
 		// UC Part
@@ -442,14 +449,30 @@ __global__ void Mobility_WaveSpace_Green_kernel(
 		B = (tid==0) ? 0.0 : tk.w * (-1.0) * ( sinf( k ) / k ) * ( 3.0 * ( sinf(k) - k*cosf(k) ) / (ksq*k) );
 		
 		// Velocity gradient contribution
-		gridXX[tid] = make_scalar2( -( Fkxx.y - kkxx*kdF.y) * B, ( Fkxx.x - kkxx*kdF.x) * B );
-		gridXY[tid] = make_scalar2( -( Fkxy.y - kkxy*kdF.y) * B, ( Fkxy.x - kkxy*kdF.x) * B );
-		gridXZ[tid] = make_scalar2( -( Fkxz.y - kkxz*kdF.y) * B, ( Fkxz.x - kkxz*kdF.x) * B );
-		gridYX[tid] = make_scalar2( -( Fkyx.y - kkyx*kdF.y) * B, ( Fkyx.x - kkyx*kdF.x) * B );
-		gridYY[tid] = make_scalar2( -( Fkyy.y - kkyy*kdF.y) * B, ( Fkyy.x - kkyy*kdF.x) * B );
-		gridYZ[tid] = make_scalar2( -( Fkyz.y - kkyz*kdF.y) * B, ( Fkyz.x - kkyz*kdF.x) * B );
-		gridZX[tid] = make_scalar2( -( Fkzx.y - kkzx*kdF.y) * B, ( Fkzx.x - kkzx*kdF.x) * B );
-		gridZY[tid] = make_scalar2( -( Fkzy.y - kkzy*kdF.y) * B, ( Fkzy.x - kkzy*kdF.x) * B );
+		tmp.x = -( Fkxx.y - kkxx*kdF.y) * B;
+		tmp.y = ( Fkxx.x - kkxx*kdF.x) * B;
+		gridXX[tid] = tmp;
+		tmp.x = -( Fkxy.y - kkxy*kdF.y) * B;
+		tmp.y = ( Fkxy.x - kkxy*kdF.x) * B;
+		gridXY[tid] = tmp;
+		tmp.x = -( Fkxz.y - kkxz*kdF.y) * B;
+		tmp.y = ( Fkxz.x - kkxz*kdF.x) * B;
+		gridXZ[tid] = tmp;
+		tmp.x = -( Fkyx.y - kkyx*kdF.y) * B;
+		tmp.y = ( Fkyx.x - kkyx*kdF.x) * B;
+		gridYX[tid] = tmp;
+		tmp.x = -( Fkyy.y - kkyy*kdF.y) * B;
+		tmp.y = ( Fkyy.x - kkyy*kdF.x) * B;
+		gridYY[tid] = tmp;
+		tmp.x = -( Fkyz.y - kkyz*kdF.y) * B;
+		tmp.y = ( Fkyz.x - kkyz*kdF.x) * B;
+		gridYZ[tid] = tmp;
+		tmp.x = -( Fkzx.y - kkzx*kdF.y) * B;
+		tmp.y = ( Fkzx.x - kkzx*kdF.x) * B;
+		gridZX[tid] = tmp;
+		tmp.x = -( Fkzy.y - kkzy*kdF.y) * B;
+		tmp.y = ( Fkzy.x - kkzy*kdF.x) * B;
+		gridZY[tid] = tmp;
 
 		//
 		// DC Part
@@ -1218,15 +1241,15 @@ __global__ void Mobility_RealSpace_kernel(
 */
 void Mobility_RealSpaceFTS(	
 				Scalar4 *d_pos,
-                        	Scalar4 *d_vel,
+                Scalar4 *d_vel,
 				Scalar4 *d_AngvelStrain,
-                        	Scalar4 *d_net_force,
+				Scalar4 *d_net_force,
 				Scalar4 *d_TorqueStress,
 				Scalar4 *d_couplet,
 				Scalar4 *d_delu,
 				unsigned int *d_group_members,
 				unsigned int group_size,
-                        	const BoxDim& box,
+                const BoxDim& box,
 				Scalar xi,
 				Scalar ewald_cut,
 				Scalar ewald_dr,
