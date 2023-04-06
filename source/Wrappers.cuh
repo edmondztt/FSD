@@ -39,8 +39,8 @@
 #define __scalar2int_rd __double2int_rd
 #endif
 
-using namespace hoomd;
-// using namespace hoomd::md;
+namespace hoomd
+{
 
 /*! \file Wrappers.cuh
     \brief Defines functions wrappers used by CUSP to solve the linear equations where required.
@@ -183,3 +183,5 @@ public:
 	
 	}
 };
+
+}

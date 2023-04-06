@@ -69,7 +69,8 @@ inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=t
 // #define CUFFTCOMPLEX cufftComplex
 // #endif
 
-using namespace hoomd;
+namespace hoomd
+{
 
 void Debug_HasNaN( Scalar *d_vec, int N );
 
@@ -143,6 +144,6 @@ void Debug_Random_Dss2(
 			Scalar dt
 			);
 
-
+}
 
 #endif

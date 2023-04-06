@@ -43,7 +43,8 @@ typedef cufftComplex hipfftComplex;
 // #define CUFFTCOMPLEX cufftComplex
 // #endif
 
-using namespace hoomd;
+namespace hoomd
+{
 
 __global__ void Precondition_ZeroVector_kernel( 
 						Scalar *d_b,
@@ -140,4 +141,5 @@ __global__ void Precondition_Lmult_kernel(
 						int group_size
 						);
 
+}
 #endif

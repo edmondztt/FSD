@@ -48,7 +48,8 @@ typedef cufftComplex hipfftComplex;
 // #define CUFFTCOMPLEX cufftComplex
 // #endif
 
-using namespace hoomd;
+namespace hoomd
+{
 
 void Saddle_Multiply( 
                         	Scalar *d_b, // output
@@ -72,5 +73,5 @@ void Saddle_Preconditioner(
 				ResistanceData *res_data
 				);
 
-
+}
 #endif

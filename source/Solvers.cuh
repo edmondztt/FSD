@@ -48,7 +48,8 @@ typedef cufftComplex hipfftComplex;
 // #define CUFFTCOMPLEX cufftComplex
 // #endif
 
-using namespace hoomd;
+namespace hoomd
+{
 
 void Solvers_Saddle(
 			Scalar *d_rhs, 
@@ -65,5 +66,6 @@ void Solvers_Saddle(
 			WorkData *work_data
 			);
 
+}
 
 #endif

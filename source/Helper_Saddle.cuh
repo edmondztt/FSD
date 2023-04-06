@@ -44,7 +44,8 @@ typedef cufftComplex hipfftComplex;
 // #define CUFFTCOMPLEX cufftComplex
 // #endif
 
-using namespace hoomd;
+namespace hoomd
+{
 
 __global__ void Saddle_ZeroOutput_kernel( 
 						Scalar *d_b, 
@@ -85,5 +86,6 @@ __global__ void Saddle_solution2vel_kernel(
 					unsigned int N
 					);
 
+}
 
 #endif

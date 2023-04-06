@@ -42,8 +42,8 @@ typedef cufftComplex hipfftComplex;
 // #define CUFFTCOMPLEX cufftComplex
 // #endif
 
-using namespace hoomd;
-
+namespace hoomd
+{
 void Brownian_FarField_SlipVelocity(
 			        	Scalar *d_Uslip_ff,
 					Scalar4 *d_pos,
@@ -56,5 +56,5 @@ void Brownian_FarField_SlipVelocity(
 					KernelData *ker_data,
 					WorkData *work_data
 					);
-
+}
 #endif

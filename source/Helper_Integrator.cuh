@@ -40,7 +40,8 @@ typedef cufftComplex hipfftComplex;
 // #define CUFFTCOMPLEX cufftComplex
 // #endif
 
-using namespace hoomd;
+namespace hoomd
+{
 
 __global__ void Integrator_RFD_RandDisp_kernel(
 						Scalar *d_psi,
@@ -56,5 +57,6 @@ __global__ void Integrator_AddStrainRate_kernel(
 						Scalar shear_rate,
 						unsigned int N
 						);
+}
 
 #endif

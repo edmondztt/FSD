@@ -89,7 +89,8 @@ typedef cufftComplex hipfftComplex;
 // #define CUFFTCOMPLEX cufftComplex
 // #endif
 
-using namespace hoomd;
+namespace hoomd
+{
 
 __global__ void Mobility_ZeroGrid_kernel(CUFFTCOMPLEX *grid, unsigned int NxNyNz);
 
@@ -103,5 +104,5 @@ __global__ void Mobility_D2WE_kernel(Scalar4 *d_delu, Scalar4 *d_omegaE, unsigne
 
 __global__ void Mobility_SetGridk_kernel(Scalar4 *gridk, int Nx, int Ny, int Nz, unsigned int NxNyNz, BoxDim box, Scalar xi, Scalar eta);
 
-
+}
 #endif

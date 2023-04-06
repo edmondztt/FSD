@@ -91,7 +91,8 @@ typedef cufftComplex hipfftComplex;
 // #define CUFFTCOMPLEX cufftComplex
 // #endif
 
-using namespace hoomd;
+namespace hoomd
+{
 
 void Mobility_MobilityUD(	
 				Scalar4 *d_pos,
@@ -252,5 +253,5 @@ void Mobility_GeneralizedMobility(
 					MobilityData *mob_data,
 					WorkData *work_data
 					);
-
+}
 #endif

@@ -47,7 +47,8 @@ typedef cufftComplex hipfftComplex;
 // #define CUFFTCOMPLEX cufftComplex
 // #endif
 
-using namespace hoomd;
+namespace hoomd
+{
 
 extern "C" __global__ void Integrator_ExplicitEuler_kernel(	
 								Scalar4 *d_pos_in,
@@ -148,5 +149,6 @@ void Integrator_ComputeVelocity(     unsigned int timestep,
 					WorkData *work_data
 					);
 
+}
 
 #endif

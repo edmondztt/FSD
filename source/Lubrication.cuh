@@ -52,7 +52,8 @@ typedef cufftComplex hipfftComplex;
 // #define CUFFTCOMPLEX cufftComplex
 // #endif
 
-using namespace hoomd;
+namespace hoomd
+{
 
 __global__ void Lubrication_RFU_kernel(
 					Scalar *d_AppliedForce,   // output
@@ -137,5 +138,5 @@ __global__ void Lubrication_RSEgeneral_kernel(
 					const Scalar ResTable_dr
 					);
 
-
+}
 #endif

@@ -47,7 +47,8 @@ typedef cufftComplex hipfftComplex;
 // #define CUFFTCOMPLEX cufftComplex
 // #endif
 
-using namespace hoomd;
+namespace hoomd
+{
 
 __global__ void Brownian_NearField_RNG_kernel(
 						Scalar *d_Psi_nf,
@@ -71,5 +72,5 @@ void Brownian_NearField_Force(
 				ResistanceData *res_data,
 				WorkData *work_data
 				);
-
+}
 #endif

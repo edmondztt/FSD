@@ -40,8 +40,9 @@ typedef cufftComplex hipfftComplex;
 // #define CUFFTCOMPLEX cufftComplex
 // #endif
 
-using namespace hoomd;
-
+namespace hoomd
+{
+	
 __global__ void Brownian_FarField_Dot1of2_kernel(Scalar4 *d_a, Scalar4 *d_b, Scalar *dot_sum, unsigned int group_size, unsigned int *d_group_members);
 
 __global__ void Brownian_FarField_Dot2of2_kernel(Scalar *dot_sum, unsigned int num_partial_sums);
@@ -72,5 +73,5 @@ void Brownian_Sqrt(
 			float *Tm,
 			Scalar *d_Tm
 			);
-
+}
 #endif

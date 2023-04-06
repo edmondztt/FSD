@@ -55,7 +55,8 @@ typedef cufftComplex hipfftComplex;
 // #define CUFFTCOMPLEX cufftComplex
 // #endif
 
-using namespace hoomd;
+namespace hoomd
+{
 
 void Precondition_Brownian_RFUmultiply(	
 					Scalar *d_y,       // output
@@ -110,5 +111,6 @@ void Precondition_Wrap(
 			WorkData *work_data
 			);
 
+}
 
 #endif

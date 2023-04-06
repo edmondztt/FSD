@@ -270,5 +270,5 @@ void Saddle_Preconditioner(
 		
 }
 
-}	// end namespace md
+// }	// end namespace md
 }	// end namespace hoomd
