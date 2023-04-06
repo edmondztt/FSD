@@ -1036,22 +1036,22 @@ void gpu_stokes_Mwave_wrap(
 */
 __global__ void Mobility_RealSpace_kernel(
 						Scalar4 *d_pos,
-			      			Scalar4 *d_vel,
+						Scalar4 *d_vel,
 						Scalar4 *d_delu,
-			      			Scalar4 *d_net_force,
+						Scalar4 *d_net_force,
 						Scalar4 *d_couplet,
-			      			int group_size,
-			      			Scalar xi,
-			      			Scalar4 *d_ewaldC1, 
-			      			Scalar2 self,
-			      			Scalar ewald_cut,
-			      			int ewald_n,
-			      			Scalar ewald_dr,
-			      			unsigned int *d_group_members,
-			      			BoxDim box,
-			      			const unsigned int *d_nneigh,
-                              			const unsigned int *d_nlist,
-                              			const unsigned int *d_headlist
+						int group_size,
+						Scalar xi,
+						Scalar4 *d_ewaldC1, 
+						Scalar2 self,
+			      		ewald_cut,
+			      		int ewald_n,
+			      		Scalar ewald_dr,
+			      		int *d_group_members,
+			      		BoxDim box,
+			      		const unsigned int *d_nneigh,
+                        const unsigned int *d_nlist,
+                        const long unsigned int *d_headlist
 						){
  
 	// Index for current thread 

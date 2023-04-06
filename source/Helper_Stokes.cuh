@@ -57,7 +57,7 @@ __global__ void Stokes_SetForce_manually_kernel(
 						unsigned int *d_group_members,
 						const unsigned int *d_nneigh, 
 						unsigned int *d_nlist, 
-						const unsigned int *d_headlist,
+						const long unsigned int *d_headlist,
 						const Scalar ndsr,
 						const Scalar k_n,
 						const Scalar kappa,

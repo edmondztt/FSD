@@ -75,7 +75,7 @@ __global__ void Stokes_SetForce_manually_kernel(
 						unsigned int *d_group_members,
 						const unsigned int *d_nneigh, 
 						unsigned int *d_nlist, 
-						const unsigned int *d_headlist,
+						const long unsigned int *d_headlist,
 						const Scalar ndsr,
 						const Scalar k_n,
 						const Scalar kappa,
@@ -106,7 +106,7 @@ __global__ void Stokes_SetForce_manually_kernel(
     Scalar Hamaker = F_0*beta;         //Hamaker constant for vdW
     
     // Neighborlist arrays
-    unsigned int head_idx = d_headlist[ idx ]; // Location in head array for neighbors of current particle
+    long unsigned int head_idx = d_headlist[ idx ]; // Location in head array for neighbors of current particle
     unsigned int n_neigh  = d_nneigh[ idx ];   // Number of neighbors of the nearest particle
 		
     for (unsigned int neigh_idx = 0; neigh_idx < n_neigh; neigh_idx++) {
