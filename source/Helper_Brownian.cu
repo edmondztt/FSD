@@ -30,6 +30,11 @@
 		in the Brownian calculations
 */
 
+namespace hoomd
+{
+// namespace md
+// {
+	
 //! Shared memory array for partial sum of dot product kernel
 extern __shared__ Scalar partial_sum[];
 
@@ -45,10 +50,6 @@ extern __shared__ Scalar partial_sum[];
         d_group_members		(input)  index into vectors
 */
 
-namespace hoomd
-{
-// namespace md
-// {
 
 __global__ void Brownian_FarField_Dot1of2_kernel(
 							Scalar4 *d_a, 
