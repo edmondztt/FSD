@@ -117,8 +117,8 @@ scalar4_tex_t tables1_tex;
 
 namespace hoomd
 {
-namespace md
-{
+// namespace md
+// {
 
 
 cudaError_t Stokes_StepOne(     unsigned int timestep,
@@ -379,5 +379,5 @@ cudaError_t Stokes_StepOne(     unsigned int timestep,
 
 }
 
-}	// end namespace md
+// }	// end namespace md
 }	// end namespace hoomd

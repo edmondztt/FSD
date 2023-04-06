@@ -133,8 +133,8 @@ scalar4_tex_t tables1_tex;
 
 namespace hoomd
 {
-namespace md
-{
+// namespace md
+// {
 
 __global__ void Mobility_WaveSpace_Spread_kernel( 	
 							Scalar4 *d_pos,
@@ -1476,5 +1476,5 @@ void Mobility_GeneralizedMobility(
 }
 
 
-}	// end namespace md
+// }	// end namespace md
 }	// end namespace hoomd

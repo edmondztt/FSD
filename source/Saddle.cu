@@ -80,8 +80,8 @@ scalar4_tex_t pos_tex;
 
 namespace hoomd
 {
-namespace md
-{
+// namespace md
+// {
 
 
 void Saddle_Multiply( 

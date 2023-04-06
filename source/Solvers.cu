@@ -56,8 +56,8 @@
 
 namespace hoomd
 {
-namespace md
-{
+// namespace md
+// {
 
 void Solvers_Saddle(
 			Scalar *d_rhs, 
@@ -133,5 +133,5 @@ void Solvers_Saddle(
 	
 }
 
-}	// end namespace md
+// }	// end namespace md
 }	// end namespace hoomd
