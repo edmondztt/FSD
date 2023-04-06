@@ -69,8 +69,8 @@
 
 namespace hoomd
 {
-namespace md
-{
+// namespace md
+// {
 
 
 __global__ void Lubrication_RFU_kernel(
@@ -1703,5 +1703,5 @@ __global__ void Lubrication_RFEgeneral_kernel(
 	} // Check for thread in bounds
 }
 
-}	// end namespace md
+// }	// end namespace md
 }	// end namespace hoomd

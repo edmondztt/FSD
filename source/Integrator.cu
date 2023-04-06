@@ -61,8 +61,8 @@
 
 namespace hoomd
 {
-namespace md
-{
+// namespace md
+// {
 
 extern "C" __global__ void Integrator_ExplicitEuler_kernel(	
 								Scalar4 *d_pos_in,
@@ -766,5 +766,5 @@ void Integrator_ComputeVelocity(     unsigned int timestep,
 	
 }
 
-}	// end namespace md
+// }	// end namespace md
 }	// end namespace hoomd

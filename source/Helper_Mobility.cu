@@ -86,8 +86,8 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 namespace hoomd
 {
-namespace md
-{
+// namespace md
+// {
 
 
 __global__ void Mobility_ZeroGrid_kernel(
@@ -390,5 +390,5 @@ __global__ void Mobility_SetGridk_kernel(
 }
 
 
-}	// end namespace md
+// }	// end namespace md
 }	// end namespace hoomd

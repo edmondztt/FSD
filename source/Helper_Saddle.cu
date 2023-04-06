@@ -36,8 +36,8 @@
 
 namespace hoomd
 {
-namespace md
-{
+// namespace md
+// {
 
 __global__ void Saddle_ZeroOutput_kernel( 
 						Scalar *d_b,
@@ -269,5 +269,5 @@ __global__ void Saddle_solution2vel_kernel(
 
 
 
-}	// end namespace md
+// }	// end namespace md
 }	// end namespace hoomd

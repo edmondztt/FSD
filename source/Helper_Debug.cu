@@ -48,8 +48,8 @@
 
 namespace hoomd
 {
-namespace md
-{
+// namespace md
+// {
 
 void Debug_StatusCheck_cuSparse( cusparseStatus_t spStatus, const char *name ){
 
@@ -716,7 +716,7 @@ void Debug_Lattice_ShearViscosity(
 
 }
 
-}	// end namespace md
+// }	// end namespace md
 }	// end namespace hoomd
 //    /*!
 //    	Compute short-time self-diffusion coefficient from the trace of the resistance tensor < Psi * RFU * Psi >

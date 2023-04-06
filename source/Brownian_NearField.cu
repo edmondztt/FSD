@@ -47,8 +47,8 @@
 */
 namespace hoomd
 {
-namespace md
-{
+// namespace md
+// {
 
 __global__ void Brownian_NearField_RNG_kernel(
 						Scalar *d_Psi_nf,
@@ -498,5 +498,5 @@ void Brownian_NearField_Force(
 
 
 
-}	// end namespace md
+// }	// end namespace md
 }	// end namespace hoomd

@@ -34,8 +34,8 @@
 
 namespace hoomd
 {
-namespace md
-{
+// namespace md
+// {
 
 __global__ void Precondition_ZeroVector_kernel(
 						Scalar *d_b,
@@ -636,5 +636,5 @@ __global__ void Precondition_Lmult_kernel(
 
 }
 
-}	// end namespace md
+// }	// end namespace md
 }	// end namespace hoomd

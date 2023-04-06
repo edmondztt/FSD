@@ -45,8 +45,8 @@
 
 namespace hoomd
 {
-namespace md
-{
+// namespace md
+// {
 __global__ void Brownian_FarField_RNG_Particle_kernel(
 							Scalar4 *d_psi,
 							unsigned int group_size,
@@ -1159,6 +1159,6 @@ void Brownian_FarField_SlipVelocity(
 	} // Check for positive Temperature
 }
 
-}	// end namespace md
+// }	// end namespace md
 }	// end namespace hoomd
 

@@ -47,8 +47,8 @@ extern __shared__ Scalar partial_sum[];
 
 namespace hoomd
 {
-namespace md
-{
+// namespace md
+// {
 
 __global__ void Brownian_FarField_Dot1of2_kernel(
 							Scalar4 *d_a, 
@@ -429,5 +429,5 @@ void Brownian_Sqrt(
 
 }
 
-}	// end namespace md
+// }	// end namespace md
 }	// end namespace hoomd

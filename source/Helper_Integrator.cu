@@ -42,8 +42,8 @@
 
 namespace hoomd
 {
-namespace md
-{
+// namespace md
+// {
 
 __global__ void Integrator_RFD_RandDisp_kernel(
 								Scalar *d_psi,
@@ -155,5 +155,5 @@ __global__ void Integrator_AddStrainRate_kernel(
 	}
 }
 
-}	// end namespace md
+// }	// end namespace md
 }	// end namespace hoomd

@@ -38,8 +38,8 @@
 
 namespace hoomd
 {
-namespace md
-{
+// namespace md
+// {
 
 __global__ void Stokes_SetForce_kernel(
 						Scalar4 *d_net_force,
@@ -190,5 +190,5 @@ __global__ void Stokes_SetVelocity_kernel(
 }
 
 
-}	// end namespace md
+// }	// end namespace md
 }	// end namespace hoomd

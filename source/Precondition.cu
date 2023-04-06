@@ -71,8 +71,8 @@
 
 namespace hoomd
 {
-namespace md
-{
+// namespace md
+// {
 
 __global__ void Precondition_GetPrunedNneigh_kernel( 	
 							unsigned int *d_nneigh_pruned, 
@@ -1873,5 +1873,5 @@ void Precondition_Saddle_RFUmultiply(
 }
 
 
-}	// end namespace md
+// }	// end namespace md
 }	// end namespace hoomd
