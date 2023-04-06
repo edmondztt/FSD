@@ -1040,18 +1040,18 @@ __global__ void Mobility_RealSpace_kernel(
 						Scalar4 *d_delu,
 						Scalar4 *d_net_force,
 						Scalar4 *d_couplet,
-						int group_size,
-						Scalar xi,
-						Scalar4 *d_ewaldC1, 
-						Scalar2 self,
-			      		ewald_cut,
+			      		int group_size,
+			      		Scalar xi,
+			      		Scalar4 *d_ewaldC1, 
+			      		Scalar2 self,
+			      		Scalar ewald_cut,
 			      		int ewald_n,
 			      		Scalar ewald_dr,
-			      		int *d_group_members,
+			      		unsigned int *d_group_members,
 			      		BoxDim box,
 			      		const unsigned int *d_nneigh,
                         const unsigned int *d_nlist,
-                        const long unsigned int *d_headlist
+                        const unsigned int *d_headlist
 						){
  
 	// Index for current thread 
